@@ -11,7 +11,7 @@ The logger will take the following environment variables to configure the logger
 | Environment Variable | Description | Default |
 | --- | --- | --- |
 | LOG_LEVEL | The log level to use. (DEBUG, INFO, WARN, ERROR) | INFO |
-| LOG_OUTPUT | The output to write the logs to. (STDOUT, STDERR) | stderr |
+| LOG_OUTPUT | The output to write the logs to. (STDOUT, STDERR) | stdout |
 | HOSTNAME | The hostname to set in the logs. |  |
 | ENVIRONMENT | The environment to set in the logs. |  |
 
@@ -52,7 +52,7 @@ import (
 )
 
 func main() {
-    logger.SetLog()
+    _ = logger.NewLogger()
     ctx := context.Background()
     ctx = logger.AddAttrs(ctx, slog.String("accountID", "12345"))
 
@@ -80,7 +80,7 @@ import (
 
 func main() {
     warnCheck := func(err error) bool { return err == context.Canceled }
-    logger.SetLog()
+    logger.NewLogger()
     logger.SetErrorWarnHandler(warnCheck)
     ctx := context.Background()
 

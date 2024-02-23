@@ -26,7 +26,7 @@ func ExampleErrorWarnHandler() {
 	warnCheck := func(err error) bool { return err != nil && err.Error() == "warn" }
 
 	// Example
-	SetLog()
+	NewLogger()
 	SetErrorWarnHandler(warnCheck)
 
 	slog.With("error", errors.New("error")).ErrorContext(ctx, "writing errors")

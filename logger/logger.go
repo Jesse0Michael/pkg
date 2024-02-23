@@ -7,21 +7,28 @@ import (
 	"strings"
 )
 
-// SetLog sets the default logger.
-func SetLog() {
+// NewLogger sets and returns a new default logger.
+func NewLogger() *slog.Logger {
 	handler := NewContextHandler(
-		slog.NewJSONHandler(LogOutput(), &slog.HandlerOptions{
-			Level: LogLevel(),
-		}),
+		NewOtelHandler(
+			slog.NewJSONHandler(LogOutput(), &slog.HandlerOptions{
+				Level: LogLevel(),
+			}),
+		),
 	)
 
 	logger := slog.New(handler)
-	logger = logger.With(
-		"host", os.Getenv("HOSTNAME"),
-		"environment", os.Getenv("ENVIRONMENT"),
-	)
+
+	// Default log attributes taken from environment variables.
+	if host, ok := os.LookupEnv("HOSTNAME"); ok {
+		logger = logger.With("host", host)
+	}
+	if env, ok := os.LookupEnv("ENVIRONMENT"); ok {
+		logger = logger.With("environment", env)
+	}
 
 	slog.SetDefault(logger)
+	return logger
 }
 
 // LogLevel returns the slog level from the LOG_LEVEL environment variable.
@@ -43,7 +50,9 @@ func LogOutput() io.Writer {
 	switch strings.ToUpper(os.Getenv("LOG_OUTPUT")) {
 	case "STDOUT":
 		return os.Stdout
-	default:
+	case "STDERR":
 		return os.Stderr
+	default:
+		return os.Stdout
 	}
 }

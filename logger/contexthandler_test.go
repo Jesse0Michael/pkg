@@ -24,7 +24,7 @@ func ExampleContextHandler() {
 	ctx := context.Background()
 
 	// Example
-	SetLog()
+	NewLogger()
 
 	ctx = AddAttrs(ctx, slog.String("accountID", "12345"))
 

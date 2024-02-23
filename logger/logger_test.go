@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-func ExampleSetLog() {
+func ExampleNewLogger() {
 	// Setup test
 	f, _ := os.CreateTemp("", "out")
 	os.Stderr = f
@@ -28,7 +28,7 @@ func ExampleSetLog() {
 	ctx := context.Background()
 
 	// Example
-	SetLog()
+	NewLogger()
 
 	slog.With("key", "value").InfoContext(ctx, "writing logs")
 	slog.With("error", errors.New("error")).ErrorContext(ctx, "writing errors")
@@ -40,7 +40,8 @@ func ExampleSetLog() {
 	// {"time":"TIMESTAMP","level":"INFO","msg":"writing logs","host":"local","environment":"test","key":"value"}
 	// {"time":"TIMESTAMP","level":"ERROR","msg":"writing errors","host":"local","environment":"test","error":"error"}
 }
-func TestSetLog(t *testing.T) {
+
+func TestNewLogger(t *testing.T) {
 	tests := []struct {
 		name  string
 		setup func()
@@ -49,14 +50,14 @@ func TestSetLog(t *testing.T) {
 		{
 			name:  "set log",
 			setup: func() {},
-			log:   `{"level":"DEBUG","msg":"message","host":"","environment":""}`,
+			log:   `{"level":"DEBUG","msg":"message"}`,
 		},
 		{
 			name: "set log with environment",
 			setup: func() {
-				_ = os.Setenv("LOG_LEVEL", "debug")
-				_ = os.Setenv("ENVIRONMENT", "test")
-				_ = os.Setenv("HOSTNAME", "local")
+				t.Setenv("LOG_LEVEL", "debug")
+				t.Setenv("ENVIRONMENT", "test")
+				t.Setenv("HOSTNAME", "local")
 			},
 			log: `{"level":"DEBUG","msg":"message","host":"local","environment":"test"}`,
 		},
@@ -64,11 +65,11 @@ func TestSetLog(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			f, _ := os.CreateTemp("", "out")
-			os.Stderr = f
+			os.Stdout = f
 
 			os.Clearenv()
 			tt.setup()
-			SetLog()
+			NewLogger()
 
 			_ = slog.Default().Handler().Handle(context.TODO(), slog.NewRecord(time.Time{}, slog.LevelDebug, "message", 0))
 			_, _ = f.Seek(0, 0)
@@ -96,28 +97,28 @@ func Test_slogLevel(t *testing.T) {
 		{
 			name: "log level: debug",
 			setup: func() {
-				_ = os.Setenv("LOG_LEVEL", "debug")
+				t.Setenv("LOG_LEVEL", "debug")
 			},
 			level: slog.LevelDebug,
 		},
 		{
 			name: "log level: INFO",
 			setup: func() {
-				_ = os.Setenv("LOG_LEVEL", "INFO")
+				t.Setenv("LOG_LEVEL", "INFO")
 			},
 			level: slog.LevelInfo,
 		},
 		{
 			name: "log level: WARN",
 			setup: func() {
-				_ = os.Setenv("LOG_LEVEL", "WARN")
+				t.Setenv("LOG_LEVEL", "WARN")
 			},
 			level: slog.LevelWarn,
 		},
 		{
 			name: "log level: ErRoR",
 			setup: func() {
-				_ = os.Setenv("LOG_LEVEL", "ErRoR")
+				t.Setenv("LOG_LEVEL", "ErRoR")
 			},
 			level: slog.LevelError,
 		},
@@ -142,19 +143,19 @@ func Test_slogOut(t *testing.T) {
 		{
 			name:   "log output: empty",
 			setup:  func() {},
-			output: os.Stderr,
+			output: os.Stdout,
 		},
 		{
 			name: "log output: stderr",
 			setup: func() {
-				_ = os.Setenv("LOG_OUTPUT", "stderr")
+				t.Setenv("LOG_OUTPUT", "stderr")
 			},
 			output: os.Stderr,
 		},
 		{
 			name: "log output: stdout",
 			setup: func() {
-				_ = os.Setenv("LOG_OUTPUT", "STDOUT")
+				t.Setenv("LOG_OUTPUT", "STDOUT")
 			},
 			output: os.Stdout,
 		},
