@@ -22,7 +22,7 @@ import (
 // but with different defaults, to make it easier to integrate into services.
 // https://github.com/open-telemetry/opentelemetry-specification/blob/v1.20.0/specification/protocol/exporter.md
 type OpenTelemetryConfig struct {
-	OpenTelemetryEndpoint   string  `envconfig:"OTEL_EXPORTER_OTLP_ENDPOINT" default:"open-telemetry-collector-daemonset-collector.default.svc:4317"` // nolint:lll
+	OpenTelemetryEndpoint   string  `envconfig:"OTEL_EXPORTER_OTLP_ENDPOINT" default:"localhost:4317"`
 	OpenTelemetryInsecure   bool    `envconfig:"OTEL_EXPORTER_OTLP_INSECURE" default:"true"`
 	OpenTelemetrySampleRate float64 `envconfig:"OTEL_TRACES_SAMPLER_ARG" default:"1.0"`
 }
