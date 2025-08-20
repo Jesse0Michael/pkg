@@ -4,7 +4,7 @@ import (
 	"crypto/rsa"
 	"os"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 // File is a custom envconfig decoder that reads a file from disk
