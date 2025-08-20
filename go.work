@@ -3,4 +3,5 @@ go 1.24.6
 use (
 	./config
 	./logger
+	./http
 )
