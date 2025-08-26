@@ -1,8 +1,10 @@
-package handlers
+package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 
 	"github.com/go-playground/validator/v10"
 	jsoniter "github.com/json-iterator/go"
@@ -39,6 +41,17 @@ func DecodeValidate(r io.Reader, v *validator.Validate, out interface{}) error {
 }
 
 // Validate is a processor function that will validate an interface with a given validator
-func Validate(v *validator.Validate) func(interface{}) error {
-	return func(o interface{}) error { return v.Var(o, "dive") }
+func Validate(v *validator.Validate) func(any) error {
+	return func(o any) error { return v.Var(o, "dive") }
+}
+
+func Encode(w http.ResponseWriter, status int, v any) error {
+	w.WriteHeader(status)
+	if v != nil {
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(v); err != nil {
+			return fmt.Errorf("failed to encode json: %w", err)
+		}
+	}
+	return nil
 }

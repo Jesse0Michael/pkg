@@ -1,9 +1,10 @@
-package handlers
+package server
 
 import (
 	"bytes"
 	"errors"
 	"io"
+	"net/http/httptest"
 	"reflect"
 	"testing"
 
@@ -113,6 +114,76 @@ func TestDecodeValidate(t *testing.T) {
 			}
 			if !reflect.DeepEqual(out, tt.want) {
 				t.Errorf("DecodeValidate() = %v, want %v", out, tt.want)
+			}
+		})
+	}
+}
+
+func TestEncode(t *testing.T) {
+	type Thing struct {
+		A string `json:"A"`
+	}
+
+	tests := []struct {
+		name       string
+		status     int
+		value      any
+		wantStatus int
+		wantBody   string
+		wantErr    error
+	}{
+		{
+			name:       "nil value",
+			status:     204,
+			value:      nil,
+			wantStatus: 204,
+			wantBody:   "",
+			wantErr:    nil,
+		},
+		{
+			name:       "valid struct",
+			status:     200,
+			value:      Thing{A: "a"},
+			wantStatus: 200,
+			wantBody:   "{\"A\":\"a\"}\n",
+			wantErr:    nil,
+		},
+		{
+			name:       "invalid value (non-marshalable)",
+			status:     200,
+			value:      func() {}, // functions cannot be marshaled to JSON
+			wantStatus: 200,
+			wantBody:   "",
+			wantErr:    errors.New("failed to encode json: json: unsupported type: func()"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			err := Encode(w, tt.status, tt.value)
+
+			resp := w.Result()
+			defer resp.Body.Close()
+
+			if resp.StatusCode != tt.wantStatus {
+				t.Errorf("Encode() status = %v, want %v", resp.StatusCode, tt.wantStatus)
+			}
+
+			body, _ := io.ReadAll(resp.Body)
+			if tt.wantBody != "" && string(body) != tt.wantBody {
+				t.Errorf("Encode() body = %q, want %q", string(body), tt.wantBody)
+			}
+			if tt.wantBody == "" && len(body) != 0 {
+				t.Errorf("Encode() body should be empty, got %q", string(body))
+			}
+
+			if tt.wantErr != nil {
+				if err == nil || err.Error() != tt.wantErr.Error() {
+					t.Errorf("Encode() error = %v, want %v", err, tt.wantErr)
+				}
+			} else if err != nil {
+				t.Errorf("Encode() error = %v, want nil", err)
 			}
 		})
 	}
