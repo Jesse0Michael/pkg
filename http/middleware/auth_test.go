@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/jesse0michael/pkg/http/auth"
+	"github.com/jesse0michael/pkg/auth"
 )
 
 type MockAuthenticator struct {

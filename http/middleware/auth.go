@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/jesse0michael/pkg/http/auth"
+	"github.com/jesse0michael/pkg/auth"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -16,11 +16,11 @@ type Authenticator interface {
 func Auth(a Authenticator) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			authorized, ctx := a.Authenticate(r)
-			if !authorized {
-				w.WriteHeader(http.StatusUnauthorized)
+			ok, ctx := a.Authenticate(r)
+			if !ok {
+				w.WriteHeader(http.StatusForbidden)
 				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{"errors":[{"message":"unauthorized"}]}`))
+				_, _ = w.Write([]byte(`{"errors":[{"message":"forbidden"}]}`))
 				return
 			}
 			span := trace.SpanFromContext(r.Context())
