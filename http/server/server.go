@@ -17,7 +17,6 @@ type Config struct {
 
 type Server struct {
 	*http.Server
-	cfg Config
 }
 
 func New(cfg Config, router Router) *Server {
