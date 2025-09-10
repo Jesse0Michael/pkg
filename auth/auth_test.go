@@ -172,3 +172,57 @@ func TestReadOnly(t *testing.T) {
 		})
 	}
 }
+
+func TestCheck(t *testing.T) {
+	tests := []struct {
+		name    string
+		subject string
+		ctx     context.Context
+		want    bool
+	}{
+		{
+			name:    "empty context",
+			subject: "test-account",
+			ctx:     context.TODO(),
+			want:    false,
+		},
+		{
+			name:    "non admin",
+			subject: "test-account",
+			ctx:     context.WithValue(context.TODO(), AdminContextKey, false),
+			want:    false,
+		},
+		{
+			name:    "admin",
+			subject: "test-account",
+			ctx:     context.WithValue(context.TODO(), AdminContextKey, true),
+			want:    true,
+		},
+		{
+			name:    "empty subject",
+			subject: "",
+			ctx:     context.WithValue(context.TODO(), SubjectContextKey, ""),
+			want:    false,
+		},
+		{
+			name:    "matching subject",
+			subject: "test-account",
+			ctx:     context.WithValue(context.TODO(), SubjectContextKey, "test-account"),
+			want:    true,
+		},
+		{
+			name:    "not matching subject",
+			subject: "test-account",
+			ctx:     context.WithValue(context.TODO(), SubjectContextKey, "non-account"),
+			want:    false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := Check(tt.ctx, tt.subject)
+			if got != tt.want {
+				t.Errorf("Check() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

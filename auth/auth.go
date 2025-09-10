@@ -29,3 +29,13 @@ func ReadOnly(ctx context.Context) (bool, bool) {
 	val, ok := ctx.Value(ReadOnlyContextKey).(bool)
 	return val, ok
 }
+
+func Check(ctx context.Context, subject string) bool {
+	if admin, ok := Admin(ctx); admin && ok {
+		return true
+	}
+	if sub, ok := Subject(ctx); subject != "" && subject == sub && ok {
+		return true
+	}
+	return false
+}
