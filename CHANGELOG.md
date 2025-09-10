@@ -1,3 +1,17 @@
+# [1.1.0](https://github.com/Jesse0Michael/pkg/compare/v1.0.0...v1.1.0) (2025-09-10)
+
+### Chores
+
+- go mod sync ([237ab47](https://github.com/Jesse0Michael/pkg/commit/237ab474aeef7528193d8091776c6274bd36ee5e))
+
+### Features
+
+- auth check ([28c210c](https://github.com/Jesse0Michael/pkg/commit/28c210c50ba36572691a6c87371b830897aab770))
+
+### Other
+
+- Merge branch 'main' of ssh://github.com/Jesse0Michael/pkg ([f4e2616](https://github.com/Jesse0Michael/pkg/commit/f4e2616d71623eb5dd286a5b61716472e652113f))
+
 # 1.0.0 (2025-08-27)
 
 ### Bug Fixes
