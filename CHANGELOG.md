@@ -1,3 +1,9 @@
+# [1.2.0](https://github.com/Jesse0Michael/pkg/compare/v1.1.0...v1.2.0) (2025-09-19)
+
+### Features
+
+- add test package ([87febb0](https://github.com/Jesse0Michael/pkg/commit/87febb090fd8ba8cacccfd3e2f6144975ab5d1f4))
+
 # [1.1.0](https://github.com/Jesse0Michael/pkg/compare/v1.0.0...v1.1.0) (2025-09-10)
 
 ### Chores
