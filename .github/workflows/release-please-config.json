@@ -3,12 +3,47 @@
   "include-component-in-tag": true,
   "tag-separator": "/",
   "packages": {
+    "auth": {
+      "release-type": "go",
+      "path": "auth",
+      "package-name": "github.com/jesse0michael/pkg/auth",
+      "component": "auth"
+    },
+    "boot": {
+      "release-type": "go",
+      "path": "boot",
+      "package-name": "github.com/jesse0michael/pkg/boot",
+      "component": "boot"
+    },
+    "cache": {
+      "release-type": "go",
+      "path": "cache",
+      "package-name": "github.com/jesse0michael/pkg/cache",
+      "component": "cache"
+    },
     "config": {
       "release-type": "go",
       "path": "config",
       "package-name": "github.com/jesse0michael/pkg/config",
-      "component": "config",
-      "bootstrap-sha": "c29ddeac3d12cc70b3bba0fa9c830bf7968f22f8"
+      "component": "config"
+    },
+    "http": {
+      "release-type": "go",
+      "path": "http",
+      "package-name": "github.com/jesse0michael/pkg/http",
+      "component": "http"
+    },
+    "logger": {
+      "release-type": "go",
+      "path": "logger",
+      "package-name": "github.com/jesse0michael/pkg/logger",
+      "component": "logger"
+    },
+    "test": {
+      "release-type": "go",
+      "path": "test",
+      "package-name": "github.com/jesse0michael/pkg/test",
+      "component": "test"
     }
   }
 }
