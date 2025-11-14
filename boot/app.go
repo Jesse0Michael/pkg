@@ -32,10 +32,31 @@ func NewApp[T any]() *App[T] {
 		cancel(err)
 	}
 
+	appConfig, hasApp := structHas[config.AppConfig](cfg)
+	otelConfig, hasOtel := structHas[config.OpenTelemetryConfig](cfg)
+	if hasApp && hasOtel {
+		resource, err := config.OtelResource(ctx, appConfig)
+		if err != nil {
+			slog.ErrorContext(ctx, "failed to create otel resource", "err", err)
+			cancel(err)
+		}
+		_, err = config.OtelTraceProvider(ctx, otelConfig, resource)
+		if err != nil {
+			slog.ErrorContext(ctx, "failed to create otel trace provider", "err", err)
+			cancel(err)
+		}
+		_, err = config.OtelMeterProvider(ctx, otelConfig, resource)
+		if err != nil {
+			slog.ErrorContext(ctx, "failed to create otel meter provider", "err", err)
+			cancel(err)
+		}
+		slog.InfoContext(ctx, "OpenTelemetry initialized", "resource", resource)
+	}
+
 	return &App[T]{
 		ctx:    ctx,
 		cancel: cancel,
-		cfg:    *cfg,
+		cfg:    cfg,
 	}
 }
 
@@ -47,7 +68,11 @@ func (a *App[T]) Cancel(cause error) {
 	a.cancel(cause)
 }
 
-func (a *App[T]) Run(runners ...Runner[T]) {
+func (a *App[T]) Run(runners ...Runner[T]) error {
+	if err := a.ctx.Err(); err != nil {
+		return err
+	}
+
 	var wg sync.WaitGroup
 	for _, runner := range runners {
 		wg.Add(1)
@@ -64,6 +89,7 @@ func (a *App[T]) Run(runners ...Runner[T]) {
 	<-a.ctx.Done()
 	if err := a.ctx.Err(); err != nil && !errors.Is(err, context.Canceled) {
 		slog.Error("app done with error", "error", err)
+		return err
 	}
 
 	for _, r := range runners {
@@ -72,4 +98,5 @@ func (a *App[T]) Run(runners ...Runner[T]) {
 
 	wg.Wait()
 	slog.Info("exiting")
+	return nil
 }
