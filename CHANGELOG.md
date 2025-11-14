@@ -1,3 +1,19 @@
+# [1.5.0](https://github.com/Jesse0Michael/pkg/compare/v1.4.0...v1.5.0) (2025-11-14)
+
+### Bug Fixes
+
+- add context to health check server ([5965558](https://github.com/Jesse0Michael/pkg/commit/5965558827f1ad8468430119ada103ec1837acf6))
+- new config shouldnt need to be a pointer ([e8b21af](https://github.com/Jesse0Michael/pkg/commit/e8b21af092a9cf365d2c41048c80d3c9ba0429fd))
+
+### Features
+
+- boot app ([a870daa](https://github.com/Jesse0Michael/pkg/commit/a870daa55773e5b0d6d99b7ff717805fda1925cf))
+- boot app and run ([21553ac](https://github.com/Jesse0Michael/pkg/commit/21553ac3a4b9877ef7068da0c78a4426a410fd4f))
+
+### Other
+
+- Merge branch 'main' of ssh://github.com/Jesse0Michael/pkg ([461b477](https://github.com/Jesse0Michael/pkg/commit/461b477b8c9f91fa686a08bfe37549bab946a064))
+
 # [1.4.0](https://github.com/Jesse0Michael/pkg/compare/v1.3.0...v1.4.0) (2025-11-14)
 
 ### Features
