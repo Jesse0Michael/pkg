@@ -6,7 +6,6 @@
     "auth": {
       "release-type": "go",
       "path": "auth",
-      "changelog-path": "auth/CHANGELOG.md",
       "package-name": "github.com/jesse0michael/pkg/auth",
       "component": "auth",
       "bootstrap-sha": "c29ddeac3d12cc70b3bba0fa9c830bf7968f22f8"
@@ -14,7 +13,6 @@
     "boot": {
       "release-type": "go",
       "path": "boot",
-      "changelog-path": "boot/CHANGELOG.md",
       "package-name": "github.com/jesse0michael/pkg/boot",
       "component": "boot",
       "bootstrap-sha": "c29ddeac3d12cc70b3bba0fa9c830bf7968f22f8"
@@ -22,7 +20,6 @@
     "cache": {
       "release-type": "go",
       "path": "cache",
-      "changelog-path": "cache/CHANGELOG.md",
       "package-name": "github.com/jesse0michael/pkg/cache",
       "component": "cache",
       "bootstrap-sha": "c29ddeac3d12cc70b3bba0fa9c830bf7968f22f8"
@@ -30,7 +27,6 @@
     "config": {
       "release-type": "go",
       "path": "config",
-      "changelog-path": "config/CHANGELOG.md",
       "package-name": "github.com/jesse0michael/pkg/config",
       "component": "config",
       "bootstrap-sha": "c29ddeac3d12cc70b3bba0fa9c830bf7968f22f8"
@@ -38,7 +34,6 @@
     "http": {
       "release-type": "go",
       "path": "http",
-      "changelog-path": "http/CHANGELOG.md",
       "package-name": "github.com/jesse0michael/pkg/http",
       "component": "http",
       "bootstrap-sha": "c29ddeac3d12cc70b3bba0fa9c830bf7968f22f8"
@@ -46,7 +41,6 @@
     "logger": {
       "release-type": "go",
       "path": "logger",
-      "changelog-path": "logger/CHANGELOG.md",
       "package-name": "github.com/jesse0michael/pkg/logger",
       "component": "logger",
       "bootstrap-sha": "c29ddeac3d12cc70b3bba0fa9c830bf7968f22f8"
@@ -54,7 +48,6 @@
     "test": {
       "release-type": "go",
       "path": "test",
-      "changelog-path": "test/CHANGELOG.md",
       "package-name": "github.com/jesse0michael/pkg/test",
       "component": "test",
       "bootstrap-sha": "c29ddeac3d12cc70b3bba0fa9c830bf7968f22f8"
