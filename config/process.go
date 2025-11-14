@@ -10,10 +10,10 @@ import (
 )
 
 // New creates and processes a generic type T with envconfig environment variables
-func New[T any]() (*T, error) {
+func New[T any]() (T, error) {
 	var cfg T
 	err := envconfig.Process("", &cfg)
-	return &cfg, err
+	return cfg, err
 }
 
 // Process loads environment variables from .env files in the specified directory

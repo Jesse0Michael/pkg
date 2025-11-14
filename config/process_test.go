@@ -159,7 +159,7 @@ func TestNew(t *testing.T) {
 		t.Errorf("New[AppConfig]() error = %v, want nil", err)
 	}
 
-	want := &AppConfig{
+	want := AppConfig{
 		Environment: "test",
 		Name:        "test-app",
 		Version:     "1.0.0",
