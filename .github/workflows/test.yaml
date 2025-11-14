@@ -17,6 +17,19 @@ jobs:
         with:
           go-version: stable
 
+      - name: Tidy Code Base
+        run: |
+          make tidy
+
+      - name: Generate Code
+        run: |
+          make generate
+
+      - name: Ensure Committed Code
+        run: |
+          git status --short
+          git diff --quiet
+
       - name: Lint Code Base
         run: |
           make lint
