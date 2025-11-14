@@ -31,3 +31,6 @@ cover:
 
 vuln: 
 	$(call modules, go tool govulncheck -test ./...)
+
+tidy:
+	$(call modules, go mod tidy)
