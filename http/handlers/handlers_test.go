@@ -73,7 +73,7 @@ func Test_HandleHealth(t *testing.T) {
 }
 
 func TestServeHealthCheckMetrics(t *testing.T) {
-	go ServeHealthCheckMetrics()
+	go ServeHealthCheckMetrics(t.Context())
 
 	resp, err := http.Get("http://localhost:9999/health")
 	if err != nil {

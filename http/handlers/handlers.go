@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 	"slices"
 	"time"
@@ -35,16 +36,24 @@ func HandleHealth() http.Handler {
 }
 
 // ServeHealthCheckMetrics serves a health check and metrics endpoint from port 9999
-func ServeHealthCheckMetrics() {
-	http.Handle("/health", HandleHealth())
-	http.Handle("/metrics", promhttp.Handler())
+// It runs in a goroutine and shuts down when the context is done
+func ServeHealthCheckMetrics(ctx context.Context) {
+	mux := http.NewServeMux()
+	mux.Handle("/health", HandleHealth())
+	mux.Handle("/metrics", promhttp.Handler())
 
 	server := &http.Server{
 		Addr:              ":9999",
+		Handler:           mux,
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
-	_ = server.ListenAndServe()
+	go func() {
+		_ = server.ListenAndServe()
+	}()
+
+	<-ctx.Done()
+	_ = server.Shutdown(context.Background())
 }
 
 // HandleWithMiddleware allows you to specify a HTTP handler that is to used with a set of middleware functions
