@@ -1,3 +1,13 @@
+# [1.4.0](https://github.com/Jesse0Michael/pkg/compare/v1.3.0...v1.4.0) (2025-11-14)
+
+### Features
+
+- add boot package ([0692e90](https://github.com/Jesse0Michael/pkg/commit/0692e908c569716b1c4fb378a68ae3b98698b6c6))
+
+### Other
+
+- Merge branch 'main' of ssh://github.com/Jesse0Michael/pkg ([ffe2bfb](https://github.com/Jesse0Michael/pkg/commit/ffe2bfb6717d18a6cb9e6388125b7fbe23e4085e))
+
 # [1.3.0](https://github.com/Jesse0Michael/pkg/compare/v1.2.0...v1.3.0) (2025-11-14)
 
 ### Features
