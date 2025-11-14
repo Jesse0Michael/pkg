@@ -18,8 +18,12 @@ import (
 func ExampleNewLogger() {
 	// Setup test
 	f, _ := os.CreateTemp("", "out")
+	origStderr := os.Stderr
 	os.Stderr = f
-	defer f.Close()
+	defer func() {
+		os.Stderr = origStderr
+		_ = f.Close()
+	}()
 
 	// Predefine environment
 	os.Setenv("ENVIRONMENT", "test")
@@ -64,8 +68,17 @@ func TestNewLogger(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			f, _ := os.CreateTemp("", "out")
+			f, err := os.CreateTemp("", "out")
+			if err != nil {
+				t.Fatalf("create temp stdout: %v", err)
+			}
+			origStdout := os.Stdout
 			os.Stdout = f
+			t.Cleanup(func() {
+				os.Stdout = origStdout
+				_ = f.Close()
+				_ = os.Remove(f.Name())
+			})
 
 			os.Clearenv()
 			tt.setup()
@@ -77,8 +90,6 @@ func TestNewLogger(t *testing.T) {
 			if !reflect.DeepEqual(tt.log, strings.TrimSpace((string(b)))) {
 				t.Errorf("slog().Handle = %v, want %v", string(b), tt.log)
 			}
-
-			f.Close()
 		})
 	}
 }
