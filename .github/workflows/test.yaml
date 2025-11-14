@@ -13,17 +13,17 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: stable
 
       - name: Lint Code Base
         run: |
-          go tool golangci-lint run ./...
+          make lint
 
       - name: Check Vulnerabilities
         run: |
-          go tool govulncheck -test ./...
+          make vuln
 
   test:
     name: Test Code Base
@@ -33,10 +33,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: stable
 
       - name: Run Unit Test
         run: |
-          go test ./...
+          make test

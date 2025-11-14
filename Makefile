@@ -1,11 +1,16 @@
 .PHONY: test build
 	
 
-MODULES := $(shell find . -name 'go.mod' -exec dirname {} \;)
+MODULES := $(shell find . -maxdepth 2 -name 'go.mod' -not -path './.git/*' -not -path './vendor/*' -exec dirname {} \; | sort | grep -v '^\.$$')
 
 define modules
-	failures=""; \
-	echo "$(MODULES)" | xargs -n1 -I{} sh -c 'cd {} && go test -cover ./... || failures="$$failures {}"'; \
+	@failures=""; \
+	for dir in $(MODULES); do \
+		echo "==> $$dir"; \
+		if ! (cd $$dir && $(1)); then \
+			failures="$$failures $$dir"; \
+		fi; \
+	done; \
 	if [ -n "$$failures" ]; then \
 		echo "FAILED MODULES:$$failures"; \
 		exit 1; \
@@ -25,4 +30,4 @@ cover:
 	go test -coverpkg ./internal/... -coverprofile coverage.out ./... && go tool cover -html=coverage.out
 
 vuln: 
-	go tool govulncheck -test ./...
+	$(call modules, go tool govulncheck -test ./...)
