@@ -11,7 +11,6 @@ import (
 )
 
 func TestFile_Decode(t *testing.T) {
-
 	tmp, _ := os.CreateTemp("", "")
 	fmt.Println(tmp.Name())
 	defer os.Remove(tmp.Name())
