@@ -4,17 +4,17 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
-  build:
-    name: tag
+  release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Semantic Release
-        uses: ridedott/release-me-action@master
+      - name: Release Please
+        uses: google-github-actions/release-please-action@v4
         with:
-          release-branches: '["main"]'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: .github/workflows/release-please-config.json
+          manifest-file: .github/workflows/release-please-manifest.json

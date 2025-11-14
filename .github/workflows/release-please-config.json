@@ -1,0 +1,42 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "include-component-in-tag": true,
+  "tag-separator": "/",
+  "packages": {
+    "auth": {
+      "release-type": "go",
+      "package-name": "github.com/jesse0michael/pkg/auth",
+      "component": "auth"
+    },
+    "boot": {
+      "release-type": "go",
+      "package-name": "github.com/jesse0michael/pkg/boot",
+      "component": "boot"
+    },
+    "cache": {
+      "release-type": "go",
+      "package-name": "github.com/jesse0michael/pkg/cache",
+      "component": "cache"
+    },
+    "config": {
+      "release-type": "go",
+      "package-name": "github.com/jesse0michael/pkg/config",
+      "component": "config"
+    },
+    "http": {
+      "release-type": "go",
+      "package-name": "github.com/jesse0michael/pkg/http",
+      "component": "http"
+    },
+    "logger": {
+      "release-type": "go",
+      "package-name": "github.com/jesse0michael/pkg/logger",
+      "component": "logger"
+    },
+    "test": {
+      "release-type": "go",
+      "package-name": "github.com/jesse0michael/pkg/test",
+      "component": "test"
+    }
+  }
+}
