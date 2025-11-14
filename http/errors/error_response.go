@@ -52,6 +52,11 @@ func (e *ErrorResponse) Error() string {
 	for i, err := range e.Errors {
 		errs[i] = errors.New(err.Message)
 	}
+
+	if len(errs) == 0 {
+		return ""
+	}
+
 	return errors.Join(errs...).Error()
 }
 
