@@ -146,3 +146,33 @@ func TestLoadEnv(t *testing.T) {
 		})
 	}
 }
+
+func TestNew(t *testing.T) {
+	// Test success case
+	t.Setenv("ENVIRONMENT", "test")
+	t.Setenv("APP_NAME", "test-app")
+	t.Setenv("VERSION", "1.0.0")
+	t.Setenv("LOG_LEVEL", "debug")
+
+	got, err := New[AppConfig]()
+	if err != nil {
+		t.Errorf("New[AppConfig]() error = %v, want nil", err)
+	}
+
+	want := &AppConfig{
+		Environment: "test",
+		Name:        "test-app",
+		Version:     "1.0.0",
+		LogLevel:    "debug",
+	}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("New[AppConfig]() = %v, want %v", got, want)
+	}
+
+	// Test failure case
+	_, err = New[map[string]string]()
+	if err == nil {
+		t.Error("New[map[string]string]() should have failed")
+	}
+}
