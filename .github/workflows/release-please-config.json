@@ -51,6 +51,14 @@
       "package-name": "github.com/jesse0michael/pkg/test",
       "component": "test",
       "bootstrap-sha": "c29ddeac3d12cc70b3bba0fa9c830bf7968f22f8"
+    },
+    ".": {
+      "changelog-path": "CHANGELOG.md",
+      "release-type": "go",
+      "bump-minor-pre-major": false,
+      "bump-patch-for-minor-pre-major": false,
+      "draft": false,
+      "prerelease": false
     }
   }
 }
