@@ -30,6 +30,11 @@ func TestError_Error(t *testing.T) {
 			err:  NewError(403, "forbidden", ""),
 			want: "(403) forbidden",
 		},
+		{
+			name: "new error just details",
+			err:  NewError(0, "", "just details"),
+			want: "just details",
+		},
 	}
 	for i := range tests {
 		tt := tests[i]

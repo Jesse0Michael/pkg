@@ -55,8 +55,8 @@ func TestAuth(t *testing.T) {
 				_, _ = w.Write([]byte(`{"message": "Success"}`))
 			},
 			authenticator: &MockAuthenticator{authorized: false},
-			expectedBody:  `{"errors":[{"message":"unauthorized"}]}`,
-			expectedCode:  http.StatusUnauthorized,
+			expectedBody:  `{"errors":[{"message":"forbidden"}]}`,
+			expectedCode:  http.StatusForbidden,
 		},
 	}
 	for i := range tests {

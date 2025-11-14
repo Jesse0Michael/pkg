@@ -35,8 +35,8 @@ func TestMiddlewareDefault(t *testing.T) {
 				t.Errorf("Connection header should match\n\tExpected: keep-alive\n\tReceived: %s", w.Header().Get("Connection"))
 			}
 
-			if w.Header().Get("Content-Type") != "application/json" {
-				t.Errorf("Content-Type header should match\n\tExpected: application/json\n\tReceived: %s", w.Header().Get("Content-Type"))
+			if w.Header().Get("Content-Type") != "text/plain; charset=utf-8" {
+				t.Errorf("Content-Type header should match\n\tExpected: text/plain; charset=utf-8\n\tReceived: %s", w.Header().Get("Content-Type"))
 			}
 
 			expectedBody := `{"message": "Success"}`

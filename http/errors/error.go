@@ -25,10 +25,13 @@ func (e *Error) Error() string {
 		return ""
 	}
 	result := e.Message
-	if e.Code >= 0 {
+	if e.Code > 0 {
 		result = fmt.Sprintf("(%d) %s", e.Code, e.Message)
 	}
 	if e.Details != "" {
+		if result == "" {
+			return e.Details
+		}
 		result += fmt.Sprintf(": %s", e.Details)
 	}
 	return result
