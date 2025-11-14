@@ -1,3 +1,9 @@
+# [1.3.0](https://github.com/Jesse0Michael/pkg/compare/v1.2.0...v1.3.0) (2025-11-14)
+
+### Features
+
+- add config.New to create and process a new config ([209c23d](https://github.com/Jesse0Michael/pkg/commit/209c23d110a994c82247e7bb63ffa05f398ebe4a))
+
 # [1.2.0](https://github.com/Jesse0Michael/pkg/compare/v1.1.0...v1.2.0) (2025-09-19)
 
 ### Features
