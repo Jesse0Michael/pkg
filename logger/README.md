@@ -1,6 +1,9 @@
 # Logger 
 
-Standardizing logging for GO applications
+Standardizing logging for GO applications.  
+Uses the standard library's [slog](https://pkg.go.dev/log/slog) for structured logging.  
+Uses the [OpenTelemetry Go SDK](https://go.opentelemetry.io/otel) to attach `trace_id`/`span_id` to every record.  
+Includes context and error handlers so attributes and severity overrides remain consistent everywhere.
 
 Uses [slog](https://pkg.go.dev/log/slog) from the standard library to have consistent structured logging across applications.
 
@@ -16,6 +19,10 @@ The logger will take the following environment variables to configure the logger
 | ENVIRONMENT | The environment to set in the logs. |  |
 
 ## Usage
+
+```bash
+go get github.com/jesse0michael/pkg/logger
+```
 
 ``` go
 import (

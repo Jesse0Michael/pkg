@@ -10,6 +10,10 @@ Contains helpful structs for common configurations to force consistency
 
 ## Usage
 
+```bash
+go get github.com/jesse0michael/pkg/config
+```
+
 ``` go
 import (
     "github.com/jesse0michael/pkg/config"
