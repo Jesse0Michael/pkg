@@ -2,6 +2,18 @@
 
 All notable changes to `github.com/jesse0michael/pkg/boot` will be documented in this file by Release Please.
 
+## [0.1.0](https://github.com/Jesse0Michael/pkg/compare/boot/v0.0.0...boot/v0.1.0) (2025-11-15)
+
+
+### Features
+
+* sync changelogs ([5252169](https://github.com/Jesse0Michael/pkg/commit/52521696340ea3310e6dd49726fbb5207d8d5cc1))
+
+
+### Bug Fixes
+
+* force tag ([b4970ec](https://github.com/Jesse0Michael/pkg/commit/b4970ec82f9d801e4345d61b5515d4c2b6c0c6e2))
+
 ## 0.0.0
 
 ### Features
