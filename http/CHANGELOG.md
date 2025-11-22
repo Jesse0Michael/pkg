@@ -2,6 +2,19 @@
 
 All notable changes to `github.com/jesse0michael/pkg/http` will be documented in this file by Release Please.
 
+## [0.1.0](https://github.com/Jesse0Michael/pkg/compare/http/v0.0.0...http/v0.1.0) (2025-11-15)
+
+
+### Features
+
+* sync changelogs ([5252169](https://github.com/Jesse0Michael/pkg/commit/52521696340ea3310e6dd49726fbb5207d8d5cc1))
+
+
+### Bug Fixes
+
+* address test issues ([0545650](https://github.com/Jesse0Michael/pkg/commit/05456503c4bac7ac3053cd2f6166125a77f64dfd))
+* handle empty error response ([ea43cff](https://github.com/Jesse0Michael/pkg/commit/ea43cff44b084d15b7eca8f32ff65b987e75777e))
+
 ## 0.0.0
 
 ### Features
