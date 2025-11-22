@@ -6,7 +6,7 @@ on:
 
 jobs:
   lint:
-    name: Lint Code Base
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -39,7 +39,7 @@ jobs:
           make vuln
 
   test:
-    name: Test Code Base
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
