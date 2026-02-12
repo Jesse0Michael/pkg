@@ -6,6 +6,7 @@ use (
 	./boot
 	./cache
 	./config
+	./grpc
 	./http
 	./logger
 	./test

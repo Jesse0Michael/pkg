@@ -27,6 +27,12 @@
       "package-name": "github.com/jesse0michael/pkg/config",
       "component": "config"
     },
+    "grpc": {
+      "release-type": "go",
+      "path": "grpc",
+      "package-name": "github.com/jesse0michael/pkg/grpc",
+      "component": "grpc"
+    },
     "http": {
       "release-type": "go",
       "path": "http",
