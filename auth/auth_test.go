@@ -173,6 +173,45 @@ func TestReadOnly(t *testing.T) {
 	}
 }
 
+func TestJTI(t *testing.T) {
+	tests := []struct {
+		name   string
+		ctx    context.Context
+		want   string
+		wantOK bool
+	}{
+		{
+			name:   "jti found",
+			ctx:    context.WithValue(context.TODO(), JTIContextKey, "test-jti"),
+			want:   "test-jti",
+			wantOK: true,
+		},
+		{
+			name:   "jti invalid",
+			ctx:    context.WithValue(context.TODO(), JTIContextKey, 12345),
+			want:   "",
+			wantOK: false,
+		},
+		{
+			name:   "jti not found",
+			ctx:    context.TODO(),
+			want:   "",
+			wantOK: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, ok := JTI(tt.ctx)
+			if got != tt.want {
+				t.Errorf("JTI() got = %v, want %v", got, tt.want)
+			}
+			if ok != tt.wantOK {
+				t.Errorf("JTI() ok = %v, want %v", ok, tt.wantOK)
+			}
+		})
+	}
+}
+
 func TestCheck(t *testing.T) {
 	tests := []struct {
 		name    string
