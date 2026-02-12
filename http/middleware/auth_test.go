@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,19 +11,17 @@ import (
 )
 
 type MockAuthenticator struct {
-	authorized bool
+	claim *auth.Claim
+	err   error
 }
 
-func (d *MockAuthenticator) Authenticate(r *http.Request) (bool, context.Context) {
-	return d.authorized, r.Context()
+func (d *MockAuthenticator) VerifyAccessToken(token string) (*auth.Claim, error) {
+	return d.claim, d.err
 }
 
 func TestAuth(t *testing.T) {
-	ctx := context.WithValue(context.TODO(), auth.SubjectContextKey, "auth")
-	ctx = context.WithValue(ctx, auth.AdminContextKey, true)
 	tests := []struct {
 		name          string
-		ctx           context.Context
 		next          http.HandlerFunc
 		authenticator Authenticator
 		expectedBody  string
@@ -30,31 +29,28 @@ func TestAuth(t *testing.T) {
 	}{
 		{
 			name: "auth success",
-			ctx:  context.TODO(),
 			next: func(w http.ResponseWriter, r *http.Request) {
 				_, _ = w.Write([]byte(`{"message": "Success"}`))
 			},
-			authenticator: &MockAuthenticator{authorized: true},
+			authenticator: &MockAuthenticator{claim: &auth.Claim{}},
 			expectedBody:  `{"message": "Success"}`,
 			expectedCode:  http.StatusOK,
 		},
 		{
-			name: "auth success - with auth context",
-			ctx:  ctx,
+			name: "auth success - with claims",
 			next: func(w http.ResponseWriter, r *http.Request) {
 				_, _ = w.Write([]byte(`{"message": "Success"}`))
 			},
-			authenticator: &MockAuthenticator{authorized: true},
+			authenticator: &MockAuthenticator{claim: &auth.Claim{Admin: true}},
 			expectedBody:  `{"message": "Success"}`,
 			expectedCode:  http.StatusOK,
 		},
 		{
 			name: "auth unauthorized",
-			ctx:  context.TODO(),
 			next: func(w http.ResponseWriter, r *http.Request) {
 				_, _ = w.Write([]byte(`{"message": "Success"}`))
 			},
-			authenticator: &MockAuthenticator{authorized: false},
+			authenticator: &MockAuthenticator{err: fmt.Errorf("invalid")},
 			expectedBody:  `{"errors":[{"message":"forbidden"}]}`,
 			expectedCode:  http.StatusForbidden,
 		},
@@ -63,7 +59,7 @@ func TestAuth(t *testing.T) {
 		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
 			w := httptest.NewRecorder()
-			req := httptest.NewRequest("GET", "/", nil).WithContext(tt.ctx)
+			req := httptest.NewRequest("GET", "/", nil)
 			Auth(tt.authenticator)(tt.next).ServeHTTP(w, req)
 
 			if w.Body.String() != tt.expectedBody {

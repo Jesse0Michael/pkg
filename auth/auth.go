@@ -1,6 +1,8 @@
 package auth
 
-import "context"
+import (
+	"context"
+)
 
 type contextKey string
 
@@ -8,8 +10,8 @@ const AuthorizationContextKey = contextKey("authorization")
 const SubjectContextKey = contextKey("subject")
 const AdminContextKey = contextKey("admin")
 const ReadOnlyContextKey = contextKey("readOnly")
-const RequestContextKey = contextKey("request")
 const JTIContextKey = contextKey("jti")
+const RequestContextKey = contextKey("request")
 
 func Authorization(ctx context.Context) (string, bool) {
 	val, ok := ctx.Value(AuthorizationContextKey).(string)

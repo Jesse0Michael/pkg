@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http"
-	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -169,22 +167,20 @@ func (s *JWTAuth) RefreshTokens(token string) (string, string, error) {
 	return s.GenerateTokens(opts...)
 }
 
-// Authenticate parses and validates a JWT using a key provided in the JWTAuth.
-// If valid, it will set identifying information from the claims into the request context.
-func (a *JWTAuth) Authenticate(r *http.Request) (context.Context, bool) {
-	auth := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
-	var claim Claim
-
-	token, err := jwt.ParseWithClaims(auth, &claim, func(token *jwt.Token) (any, error) {
-		return a.cfg.SecretKey, nil
-	}, a.Options...)
-	if err != nil || !token.Valid {
-		return r.Context(), false
+// WithClaims sets identifying information from the claims into the context
+func WithClaims(ctx context.Context, claim *Claim) context.Context {
+	if claim.Subject != "" {
+		ctx = context.WithValue(ctx, SubjectContextKey, claim.Subject)
 	}
-
-	ctx := context.WithValue(r.Context(), AuthorizationContextKey, auth)
-	ctx = context.WithValue(ctx, SubjectContextKey, claim.Subject)
-	ctx = context.WithValue(ctx, AdminContextKey, claim.Admin)
-	ctx = context.WithValue(ctx, ReadOnlyContextKey, claim.ReadOnly)
-	return ctx, true
+	if claim.Admin {
+		ctx = context.WithValue(ctx, AdminContextKey, claim.Admin)
+	}
+	if claim.ReadOnly {
+		ctx = context.WithValue(ctx, ReadOnlyContextKey, claim.ReadOnly)
+	}
+	if claim.ID != "" {
+		ctx = context.WithValue(ctx, JTIContextKey, claim.ID)
+	}
+	return ctx
 }
+
