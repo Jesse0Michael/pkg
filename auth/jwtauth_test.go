@@ -32,25 +32,36 @@ func TestNewAuthService(t *testing.T) {
 
 func TestGenerateTokens(t *testing.T) {
 	tests := []struct {
-		name          string
-		subject       string
-		signingMethod jwt.SigningMethod
-		signingKey    any
-		wantErr       bool
+		name    string
+		options []TokenOption
 	}{
 		{
-			name:          "valid token generation",
-			subject:       uuid.NewString(),
-			signingMethod: jwt.SigningMethodHS256,
-			signingKey:    []byte("test-secret"),
-			wantErr:       false,
+			name: "empty options",
 		},
 		{
-			name:          "empty subject",
-			subject:       "",
-			signingMethod: jwt.SigningMethodHS256,
-			signingKey:    []byte("test-secret"),
-			wantErr:       false,
+			name:    "with subject",
+			options: []TokenOption{WithSubject("test-subject")},
+		},
+		{
+			name:    "with audience",
+			options: []TokenOption{WithAudience("test-audience-1", "test-audience-2")},
+		},
+		{
+			name:    "with admin",
+			options: []TokenOption{WithAdmin()},
+		},
+		{
+			name:    "with read only",
+			options: []TokenOption{WithReadOnly()},
+		},
+		{
+			name: "with all options",
+			options: []TokenOption{
+				WithSubject("test-subject"),
+				WithAudience("test-audience"),
+				WithAdmin(),
+				WithReadOnly(),
+			},
 		},
 	}
 
@@ -63,13 +74,8 @@ func TestGenerateTokens(t *testing.T) {
 				RefreshTokenTTL: time.Hour * 24 * 7,
 			}
 
-			svc := NewJWTAuth(cfg, tt.signingMethod)
-			accessToken, refreshToken, err := svc.GenerateTokens(tt.subject)
-
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
+			svc := NewJWTAuth(cfg, jwt.SigningMethodHS256)
+			accessToken, refreshToken, err := svc.GenerateTokens(tt.options...)
 
 			require.NoError(t, err)
 			require.NotEmpty(t, accessToken)
@@ -96,7 +102,7 @@ func TestVerifyAccessToken(t *testing.T) {
 	}
 
 	svc := NewJWTAuth(cfg, jwt.SigningMethodHS256)
-	accessToken, _, err := svc.GenerateTokens(userID)
+	accessToken, _, err := svc.GenerateTokens(WithSubject(userID))
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -162,7 +168,7 @@ func TestVerifyRefreshToken(t *testing.T) {
 	}
 
 	svc := NewJWTAuth(cfg, jwt.SigningMethodHS256)
-	_, refreshToken, err := svc.GenerateTokens(userID)
+	_, refreshToken, err := svc.GenerateTokens(WithSubject(userID))
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -228,7 +234,7 @@ func TestRefreshTokens(t *testing.T) {
 	}
 
 	svc := NewJWTAuth(cfg, jwt.SigningMethodHS256)
-	_, refreshToken, err := svc.GenerateTokens(userID)
+	_, refreshToken, err := svc.GenerateTokens(WithSubject(userID))
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -297,7 +303,7 @@ func TestExpiredToken(t *testing.T) {
 	}
 
 	svc := NewJWTAuth(cfg, jwt.SigningMethodHS256)
-	accessToken, _, err := svc.GenerateTokens(userID)
+	accessToken, _, err := svc.GenerateTokens(WithSubject(userID))
 	require.NoError(t, err)
 
 	// Wait for token to expire
@@ -319,7 +325,7 @@ func TestTokenTypeValidation(t *testing.T) {
 	}
 
 	svc := NewJWTAuth(cfg, jwt.SigningMethodHS256)
-	accessToken, refreshToken, err := svc.GenerateTokens(userID)
+	accessToken, refreshToken, err := svc.GenerateTokens(WithSubject(userID))
 	require.NoError(t, err)
 
 	// Try to use access token as refresh token
@@ -343,7 +349,7 @@ func TestExtractUserIDFromToken(t *testing.T) {
 	}
 
 	svc := NewJWTAuth(cfg, jwt.SigningMethodHS256)
-	accessToken, refreshToken, err := svc.GenerateTokens(userID)
+	accessToken, refreshToken, err := svc.GenerateTokens(WithSubject(userID))
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -413,7 +419,7 @@ func TestVerifyTokenWithInvalidSigningMethod(t *testing.T) {
 	}
 
 	svc := NewJWTAuth(cfg, jwt.SigningMethodHS256)
-	accessToken, _, err := svc.GenerateTokens(userID)
+	accessToken, _, err := svc.GenerateTokens(WithSubject(userID))
 	require.NoError(t, err)
 
 	// This test simulates what would happen if the token verification encountered
@@ -469,7 +475,7 @@ func TestWithInvalidConfig(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			svc := NewJWTAuth(tt.cfg, jwt.SigningMethodHS256)
 			userID := uuid.NewString()
-			accessToken, refreshToken, err := svc.GenerateTokens(userID)
+			accessToken, refreshToken, err := svc.GenerateTokens(WithSubject(userID))
 
 			if !tt.shouldWork {
 				if err == nil {

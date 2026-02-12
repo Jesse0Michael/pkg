@@ -39,13 +39,13 @@ type Config struct {
 
 type Claim struct {
 	// Admin indicates if the user has admin privileges
-	Admin bool `json:"admin"`
+	Admin bool `json:"admin,omitempty"`
 
 	// ReadOnly indicates if the user has read-only access
-	ReadOnly bool `json:"readOnly"`
+	ReadOnly bool `json:"readOnly,omitempty"`
 
 	// TokenType indicates the type of the token (access or refresh)
-	TokenType string `json:"type"`
+	TokenType string `json:"type,omitempty"`
 
 	jwt.RegisteredClaims
 }
@@ -65,13 +65,15 @@ func NewJWTAuth(cfg Config, signingMethod jwt.SigningMethod, opts ...jwt.ParserO
 }
 
 // GenerateTokens creates both access and refresh tokens for a user in one call
-func (a *JWTAuth) GenerateTokens(subject string) (string, string, error) {
-	accessToken, err := a.generateToken(subject, AccessTokenType, a.cfg.AccessTokenTTL)
+func (a *JWTAuth) GenerateTokens(opts ...TokenOption) (string, string, error) {
+	p := applyTokenOptions(opts)
+
+	accessToken, err := a.generateToken(p, AccessTokenType, a.cfg.AccessTokenTTL)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to generate access token: %w", err)
 	}
 
-	refreshToken, err := a.generateToken(subject, RefreshTokenType, a.cfg.RefreshTokenTTL)
+	refreshToken, err := a.generateToken(p, RefreshTokenType, a.cfg.RefreshTokenTTL)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to generate refresh token: %w", err)
 	}
@@ -80,19 +82,22 @@ func (a *JWTAuth) GenerateTokens(subject string) (string, string, error) {
 }
 
 // generateToken generates a token with the supplied parameters
-func (a *JWTAuth) generateToken(subject, tokenType string, ttl time.Duration) (string, error) {
+func (a *JWTAuth) generateToken(p tokenParams, tokenType string, ttl time.Duration) (string, error) {
 	tokenID := uuid.New().String()
 	now := time.Now()
 	expiresAt := now.Add(ttl)
 	claims := Claim{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    a.cfg.Issuer,
-			Subject:   subject,
+			Subject:   p.subject,
+			Audience:  p.audience,
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
 			IssuedAt:  jwt.NewNumericDate(now),
 			ID:        tokenID,
 		},
 		TokenType: tokenType,
+		Admin:     p.admin,
+		ReadOnly:  p.readOnly,
 	}
 
 	token := jwt.NewWithClaims(a.signingMethod, claims)
@@ -150,7 +155,18 @@ func (s *JWTAuth) RefreshTokens(token string) (string, string, error) {
 		return "", "", err
 	}
 
-	return s.GenerateTokens(claims.Subject)
+	opts := []TokenOption{WithSubject(claims.Subject)}
+	if claims.Admin {
+		opts = append(opts, WithAdmin())
+	}
+	if claims.ReadOnly {
+		opts = append(opts, WithReadOnly())
+	}
+	if len(claims.Audience) > 0 {
+		opts = append(opts, WithAudience(claims.Audience...))
+	}
+
+	return s.GenerateTokens(opts...)
 }
 
 // Authenticate parses and validates a JWT using a key provided in the JWTAuth.
