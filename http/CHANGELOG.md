@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/http` will be documented in this file by Release Please.
 
+## [0.2.0](https://github.com/Jesse0Michael/pkg/compare/http/v0.1.0...http/v0.2.0) (2026-02-13)
+
+
+### Features
+
+* auth claims ([f37a63c](https://github.com/Jesse0Michael/pkg/commit/f37a63ce12bfcd66c11ba3fbc23f50b79e8f289a))
+
 ## [0.1.0](https://github.com/Jesse0Michael/pkg/compare/http/v0.0.0...http/v0.1.0) (2025-11-15)
 
 
