@@ -2,6 +2,19 @@
 
 All notable changes to `github.com/jesse0michael/pkg/auth` will be documented in this file by Release Please.
 
+## [0.2.0](https://github.com/Jesse0Michael/pkg/compare/auth/v0.1.0...auth/v0.2.0) (2026-02-13)
+
+
+### Features
+
+* add generate token options ([71122ea](https://github.com/Jesse0Michael/pkg/commit/71122ead6a7364f278d0c8e17d4a5309ad197295))
+* auth claims ([f37a63c](https://github.com/Jesse0Michael/pkg/commit/f37a63ce12bfcd66c11ba3fbc23f50b79e8f289a))
+
+
+### Bug Fixes
+
+* auth jti method ([1e21ccf](https://github.com/Jesse0Michael/pkg/commit/1e21ccf554d0b9eff14ceec29bf62ee13d26df40))
+
 ## [0.1.0](https://github.com/Jesse0Michael/pkg/compare/auth/v0.0.0...auth/v0.1.0) (2025-11-15)
 
 
