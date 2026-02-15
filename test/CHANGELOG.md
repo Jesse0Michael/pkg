@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/test` will be documented in this file by Release Please.
 
+## [0.2.0](https://github.com/Jesse0Michael/pkg/compare/test/v0.1.0...test/v0.2.0) (2026-02-15)
+
+
+### Features
+
+* add mock http test helper ([b1bcd57](https://github.com/Jesse0Michael/pkg/commit/b1bcd575a6604b4727067df98be6143cb4b2bf36))
+
 ## [0.1.0](https://github.com/Jesse0Michael/pkg/compare/test/v0.0.0...test/v0.1.0) (2025-11-15)
 
 
