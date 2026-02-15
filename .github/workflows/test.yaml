@@ -20,6 +20,7 @@ jobs:
       - name: Setup Protoc
         uses: arduino/setup-protoc@v3
         with:
+          version: "33.4"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Tidy Code Base
@@ -58,6 +59,7 @@ jobs:
       - name: Setup Protoc
         uses: arduino/setup-protoc@v3
         with:
+          version: "33.4"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Unit Test
