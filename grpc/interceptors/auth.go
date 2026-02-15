@@ -72,6 +72,44 @@ func AuthStreamServerInterceptor(a Authenticator) grpc.StreamServerInterceptor {
 	}
 }
 
+// authenticate extracts the Bearer token from gRPC metadata, verifies it as an
+// access token, and returns a context enriched with the claim values.
+func authenticate(ctx context.Context, a Authenticator) (context.Context, *auth.Claim, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return ctx, nil, ErrUnauthenticated
+	}
+
+	vals := md.Get("authorization")
+	if len(vals) == 0 {
+		return ctx, nil, ErrUnauthenticated
+	}
+
+	token := strings.TrimPrefix(vals[0], "Bearer ")
+	claims, err := a.VerifyAccessToken(token)
+	if err != nil {
+		slog.WarnContext(ctx, "JWT verification failed", "err", err)
+		return ctx, nil, ErrUnauthenticated
+	}
+
+	ctx = context.WithValue(ctx, auth.AuthorizationContextKey, token)
+	ctx = auth.WithClaims(ctx, claims)
+	ctx = auth.WithSpan(ctx)
+
+	return ctx, claims, nil
+}
+
+// authorize checks admin_only and reject_read_only constraints against the authenticated claims.
+func authorize(claims *auth.Claim, fullMethod string) error {
+	if hasAdminOnly(fullMethod) && !claims.Admin {
+		return ErrPermissionDenied
+	}
+	if hasRejectReadOnly(fullMethod) && claims.ReadOnly {
+		return ErrPermissionDenied
+	}
+	return nil
+}
+
 // resolveMethod parses a gRPC full method name and returns the service and
 // method descriptors from the global proto registry.
 func resolveMethod(fullMethod string) (protoreflect.ServiceDescriptor, protoreflect.MethodDescriptor) {
@@ -135,44 +173,6 @@ func hasAdminOnly(fullMethod string) bool {
 func hasRejectReadOnly(fullMethod string) bool {
 	_, md := resolveMethod(fullMethod)
 	return methodBoolOption(md, options.E_RejectReadOnly)
-}
-
-// authenticate extracts the Bearer token from gRPC metadata, verifies it as an
-// access token, and returns a context enriched with the claim values.
-func authenticate(ctx context.Context, a Authenticator) (context.Context, *auth.Claim, error) {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return ctx, nil, ErrUnauthenticated
-	}
-
-	vals := md.Get("authorization")
-	if len(vals) == 0 {
-		return ctx, nil, ErrUnauthenticated
-	}
-
-	token := strings.TrimPrefix(vals[0], "Bearer ")
-	claims, err := a.VerifyAccessToken(token)
-	if err != nil {
-		slog.WarnContext(ctx, "JWT verification failed", "err", err)
-		return ctx, nil, ErrUnauthenticated
-	}
-
-	ctx = context.WithValue(ctx, auth.AuthorizationContextKey, token)
-	ctx = auth.WithClaims(ctx, claims)
-	ctx = auth.WithSpan(ctx)
-
-	return ctx, claims, nil
-}
-
-// authorize checks admin_only and reject_read_only constraints against the authenticated claims.
-func authorize(claims *auth.Claim, fullMethod string) error {
-	if hasAdminOnly(fullMethod) && !claims.Admin {
-		return ErrPermissionDenied
-	}
-	if hasRejectReadOnly(fullMethod) && claims.ReadOnly {
-		return ErrPermissionDenied
-	}
-	return nil
 }
 
 type wrappedServerStream struct {
