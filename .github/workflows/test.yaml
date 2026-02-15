@@ -17,6 +17,11 @@ jobs:
         with:
           go-version: stable
 
+      - name: Setup Protoc
+        uses: arduino/setup-protoc@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Tidy Code Base
         run: |
           make tidy
@@ -49,6 +54,11 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: stable
+
+      - name: Setup Protoc
+        uses: arduino/setup-protoc@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Unit Test
         run: |
