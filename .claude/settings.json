@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Bash(make:*)",
+      "Bash(grep:*)",
+      "Bash(sed:*)",
+      "Bash(go:*)",
+      "Bash(buf:*)",
+      "Bash(find:*)",
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git show*)",
+      "Bash(git branch*)",
+      "Bash(git checkout*)",
+      "Bash(git add*)",
+      "WebFetch(domain:go.dev)",
+      "WebFetch(domain:google.github.io)",
+      "WebFetch(domain:dave.cheney.net)"
+    ]
+  }
+}
