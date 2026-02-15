@@ -1,4 +1,4 @@
-.PHONY: test build
+.PHONY: test build proto
 	
 
 MODULES := $(shell find . -maxdepth 2 -name 'go.mod' -not -path './.git/*' -not -path './vendor/*' -exec dirname {} \; | sort | grep -v '^\.$$')
@@ -24,6 +24,8 @@ tidy:
 	$(call modules, go mod tidy)
 
 generate:
+	protoc --proto_path=proto --go_out=grpc/proto --go_opt=paths=source_relative options/v1/auth.proto
+	protoc --proto_path=proto --proto_path=grpc/proto --go_out=grpc/proto --go_opt=paths=source_relative test/test.proto
 	$(call modules, go generate ./...)
 
 #################################################################################

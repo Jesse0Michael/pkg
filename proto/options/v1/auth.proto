@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package options.v1;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "github.com/jesse0michael/pkg/grpc/proto/options/v1;options";
+
+extend google.protobuf.MethodOptions {
+  // Set no_auth = true on an RPC to bypass authentication.
+  bool no_auth = 50000;
+
+  // Set admin_only = true on an RPC to restrict access to admin users.
+  bool admin_only = 50001;
+
+  // Set reject_read_only = true on an RPC to reject read-only users.
+  bool reject_read_only = 50002;
+}
+
+extend google.protobuf.ServiceOptions {
+  // Set service_no_auth = true to bypass authentication for all RPCs in a service.
+  bool service_no_auth = 50000;
+
+  // Set service_admin_only = true to restrict all RPCs in a service to admin users.
+  bool service_admin_only = 50001;
+}

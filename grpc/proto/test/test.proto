@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package testproto;
+
+import "options/v1/auth.proto";
+
+option go_package = "github.com/jesse0michael/pkg/grpc/proto/test";
+
+message Empty {}
+
+service TestService {
+  // Authed is a normal RPC that requires authentication.
+  rpc Authed(Empty) returns (Empty) {}
+
+  // Public is marked with no_auth and should bypass authentication.
+  rpc Public(Empty) returns (Empty) {
+    option (options.v1.no_auth) = true;
+  }
+
+  // AdminMethod is restricted to admin users.
+  rpc AdminMethod(Empty) returns (Empty) {
+    option (options.v1.admin_only) = true;
+  }
+
+  // WriteMethod rejects read-only users.
+  rpc WriteMethod(Empty) returns (Empty) {
+    option (options.v1.reject_read_only) = true;
+  }
+}
+
+// PublicService has service-level no_auth set.
+service PublicService {
+  option (options.v1.service_no_auth) = true;
+
+  rpc DoPublic(Empty) returns (Empty) {}
+}
+
+// AdminService has service-level admin_only set.
+service AdminService {
+  option (options.v1.service_admin_only) = true;
+
+  rpc DoAdmin(Empty) returns (Empty) {}
+}
