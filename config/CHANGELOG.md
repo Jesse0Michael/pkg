@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/config` will be documented in this file by Release Please.
 
+## [0.2.1](https://github.com/Jesse0Michael/pkg/compare/config/v0.2.0...config/v0.2.1) (2026-02-15)
+
+
+### Bug Fixes
+
+* make tidy ([94dc3b9](https://github.com/Jesse0Michael/pkg/commit/94dc3b94503d4ab715c363008eba9e79036830c6))
+
 ## [0.2.0](https://github.com/Jesse0Michael/pkg/compare/config/v0.1.0...config/v0.2.0) (2025-11-15)
 
 
