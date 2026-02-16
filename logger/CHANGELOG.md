@@ -2,6 +2,20 @@
 
 All notable changes to `github.com/jesse0michael/pkg/logger` will be documented in this file by Release Please.
 
+## [0.3.0](https://github.com/Jesse0Michael/pkg/compare/logger/v0.2.0...logger/v0.3.0) (2026-02-16)
+
+
+### Features
+
+* add logger package ([ab87f00](https://github.com/Jesse0Michael/pkg/commit/ab87f005493b3ec755c28210defead2ce9f42dd4))
+* sync changelogs ([5252169](https://github.com/Jesse0Michael/pkg/commit/52521696340ea3310e6dd49726fbb5207d8d5cc1))
+* update logger package ([deb3fbd](https://github.com/Jesse0Michael/pkg/commit/deb3fbd8503e339f8026bbea6787902fe8a5a5ae))
+
+
+### Bug Fixes
+
+* make tidy ([94dc3b9](https://github.com/Jesse0Michael/pkg/commit/94dc3b94503d4ab715c363008eba9e79036830c6))
+
 ## [0.2.0](https://github.com/Jesse0Michael/pkg/compare/logger/v0.1.1...logger/v0.2.0) (2026-02-16)
 
 
