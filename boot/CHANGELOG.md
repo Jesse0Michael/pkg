@@ -2,6 +2,22 @@
 
 All notable changes to `github.com/jesse0michael/pkg/boot` will be documented in this file by Release Please.
 
+## [0.3.0](https://github.com/Jesse0Michael/pkg/compare/boot/v0.2.0...boot/v0.3.0) (2026-02-16)
+
+
+### Features
+
+* add boot package ([0692e90](https://github.com/Jesse0Michael/pkg/commit/0692e908c569716b1c4fb378a68ae3b98698b6c6))
+* boot app ([a870daa](https://github.com/Jesse0Michael/pkg/commit/a870daa55773e5b0d6d99b7ff717805fda1925cf))
+* boot app and run ([21553ac](https://github.com/Jesse0Michael/pkg/commit/21553ac3a4b9877ef7068da0c78a4426a410fd4f))
+* sync changelogs ([5252169](https://github.com/Jesse0Michael/pkg/commit/52521696340ea3310e6dd49726fbb5207d8d5cc1))
+
+
+### Bug Fixes
+
+* force tag ([b4970ec](https://github.com/Jesse0Michael/pkg/commit/b4970ec82f9d801e4345d61b5515d4c2b6c0c6e2))
+* make tidy ([94dc3b9](https://github.com/Jesse0Michael/pkg/commit/94dc3b94503d4ab715c363008eba9e79036830c6))
+
 ## [0.2.0](https://github.com/Jesse0Michael/pkg/compare/boot/v0.1.1...boot/v0.2.0) (2026-02-16)
 
 
