@@ -2,6 +2,19 @@
 
 All notable changes to `github.com/jesse0michael/pkg/cache` will be documented in this file by Release Please.
 
+## [0.2.0](https://github.com/Jesse0Michael/pkg/compare/cache/v0.1.1...cache/v0.2.0) (2026-02-16)
+
+
+### Features
+
+* add cache package ([5e8ff3c](https://github.com/Jesse0Michael/pkg/commit/5e8ff3c7556526da7edaa3600496322daeb8f0d3))
+* sync changelogs ([5252169](https://github.com/Jesse0Michael/pkg/commit/52521696340ea3310e6dd49726fbb5207d8d5cc1))
+
+
+### Bug Fixes
+
+* make tidy ([94dc3b9](https://github.com/Jesse0Michael/pkg/commit/94dc3b94503d4ab715c363008eba9e79036830c6))
+
 ## [0.1.1](https://github.com/Jesse0Michael/pkg/compare/cache/v0.1.0...cache/v0.1.1) (2026-02-15)
 
 
