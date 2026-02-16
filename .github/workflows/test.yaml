@@ -17,11 +17,10 @@ jobs:
         with:
           go-version: stable
 
-      - name: Setup Protoc
-        uses: arduino/setup-protoc@v3
+      - name: Setup Buf
+        uses: bufbuild/buf-setup-action@v1
         with:
-          version: "33.4"
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Tidy Code Base
         run: |
@@ -56,11 +55,10 @@ jobs:
         with:
           go-version: stable
 
-      - name: Setup Protoc
-        uses: arduino/setup-protoc@v3
+      - name: Setup Buf
+        uses: bufbuild/buf-setup-action@v1
         with:
-          version: "33.4"
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Unit Test
         run: |

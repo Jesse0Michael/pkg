@@ -1,0 +1,28 @@
+name: Buf Push
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "proto/**"
+
+jobs:
+  push:
+    name: Push to BSR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Buf
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Lint Protos
+        run: buf lint
+
+      - name: Push to BSR
+        env:
+          BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
+        run: buf push

@@ -1,0 +1,14 @@
+version: v2
+modules:
+  - path: proto
+    name: buf.build/jesse0michael/pkg
+lint:
+  use:
+    - STANDARD
+  ignore:
+    - proto/test
+breaking:
+  use:
+    - FILE
+  ignore:
+    - proto/test
