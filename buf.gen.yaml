@@ -2,4 +2,4 @@ version: v2
 plugins:
   - local: ["go", "tool", "protoc-gen-go"]
     out: grpc/proto
-    opt: paths=source_relative
+    opt: module=github.com/jesse0michael/pkg/grpc/proto

@@ -25,4 +25,4 @@ jobs:
       - name: Push to BSR
         env:
           BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
-        run: buf push
+        run: buf push --exclude-unnamed
