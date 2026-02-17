@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/test` will be documented in this file by Release Please.
 
+## [0.3.0](https://github.com/Jesse0Michael/pkg/compare/test/v0.2.0...test/v0.3.0) (2026-02-17)
+
+
+### Features
+
+* enhance MockHTTP to support HTTPS and HTTP ([d3b0fcf](https://github.com/Jesse0Michael/pkg/commit/d3b0fcf3da4358c3f6945ec99e853026031fe223))
+
 ## [0.2.0](https://github.com/Jesse0Michael/pkg/compare/test/v0.1.0...test/v0.2.0) (2026-02-15)
 
 
