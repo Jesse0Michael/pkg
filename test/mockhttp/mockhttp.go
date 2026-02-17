@@ -2,10 +2,12 @@ package mockhttp
 
 import (
 	"bytes"
+	"context"
+	"crypto/tls"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"strings"
 	"sync"
 	"testing"
@@ -24,6 +26,7 @@ type expectation struct {
 
 type MockHTTP struct {
 	server       *httptest.Server
+	tlsServer    *httptest.Server
 	mu           sync.Mutex
 	expectations []*expectation
 	requests     []*http.Request
@@ -31,16 +34,25 @@ type MockHTTP struct {
 	Client       *http.Client
 }
 
-// NewMockHTTP creates a new mock HTTP server
+// NewMockHTTP creates a new mock HTTP server that handles both HTTP and HTTPS requests.
 func NewMockHTTP() *MockHTTP {
 	m := &MockHTTP{}
-	m.server = httptest.NewServer(http.HandlerFunc(m.handle))
+	handler := http.HandlerFunc(m.handle)
+	m.server = httptest.NewServer(handler)
+	m.tlsServer = httptest.NewTLSServer(handler)
 	m.URL = m.server.URL
-	m.Client = &http.Client{Transport: &http.Transport{
-		Proxy: func(req *http.Request) (*url.URL, error) {
-			return url.Parse(m.URL)
-		},
-	}}
+
+	httpAddr := m.server.Listener.Addr().String()
+	tlsAddr := m.tlsServer.Listener.Addr().String()
+
+	transport := m.tlsServer.Client().Transport.(*http.Transport).Clone()
+	transport.DialContext = func(ctx context.Context, network, _ string) (net.Conn, error) {
+		return (&net.Dialer{}).DialContext(ctx, network, httpAddr)
+	}
+	transport.DialTLSContext = func(ctx context.Context, network, _ string) (net.Conn, error) {
+		return tls.DialWithDialer(&net.Dialer{}, network, tlsAddr, &tls.Config{InsecureSkipVerify: true})
+	}
+	m.Client = &http.Client{Transport: transport}
 	return m
 }
 
@@ -107,9 +119,10 @@ func (m *MockHTTP) Validate(t *testing.T) {
 	}
 }
 
-// Close shuts down the test server
+// Close shuts down the test servers
 func (m *MockHTTP) Close() {
 	m.server.Close()
+	m.tlsServer.Close()
 }
 
 // --- Helper types and functions ---
