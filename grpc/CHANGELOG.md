@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/Jesse0Michael/pkg/compare/grpc/v1.3.0...grpc/v1.3.1) (2026-02-18)
+
+
+### Bug Fixes
+
+* set envconfig default rate limit values ([14a65ca](https://github.com/Jesse0Michael/pkg/commit/14a65ca2a7f687945581b00e2d727015a9a013e9))
+
 ## [1.3.0](https://github.com/Jesse0Michael/pkg/compare/grpc/v1.2.0...grpc/v1.3.0) (2026-02-18)
 
 
