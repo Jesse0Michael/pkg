@@ -36,7 +36,7 @@ func TestLogUnaryServerInterceptor(t *testing.T) {
 			handler := func(_ context.Context, _ any) (any, error) { return nil, tt.err }
 			info := &grpc.UnaryServerInfo{FullMethod: "/test.Service/Method"}
 
-			interceptor(t.Context(), nil, info, handler)
+			_, _ = interceptor(t.Context(), nil, info, handler)
 
 			require.Equal(t, tt.wantLog, buf.Len() > 0)
 		})
@@ -69,7 +69,7 @@ func TestLogStreamServerInterceptor(t *testing.T) {
 			handler := func(_ any, _ grpc.ServerStream) error { return tt.err }
 			info := &grpc.StreamServerInfo{FullMethod: "/test.Service/Method"}
 
-			interceptor(nil, ss, info, handler)
+			_ = interceptor(nil, ss, info, handler)
 
 			require.Equal(t, tt.wantLog, buf.Len() > 0)
 		})
