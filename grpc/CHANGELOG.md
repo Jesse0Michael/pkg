@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0](https://github.com/Jesse0Michael/pkg/compare/grpc/v1.2.0...grpc/v1.3.0) (2026-02-18)
+
+
+### Features
+
+* add log interceptor ([47c0f82](https://github.com/Jesse0Michael/pkg/commit/47c0f82694adecb7f685725b8060a787210d4231))
+* rate limiter interceptor ([594def4](https://github.com/Jesse0Michael/pkg/commit/594def4a92083b95e363cc880cfc5bfb195e4855))
+
 ## [1.2.0](https://github.com/Jesse0Michael/pkg/compare/grpc/v1.1.0...grpc/v1.2.0) (2026-02-16)
 
 
