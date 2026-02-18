@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/http` will be documented in this file by Release Please.
 
+## [0.5.0](https://github.com/Jesse0Michael/pkg/compare/http/v0.4.0...http/v0.5.0) (2026-02-18)
+
+
+### Features
+
+* rate limiter interceptor ([594def4](https://github.com/Jesse0Michael/pkg/commit/594def4a92083b95e363cc880cfc5bfb195e4855))
+
 ## [0.4.0](https://github.com/Jesse0Michael/pkg/compare/http/v0.3.0...http/v0.4.0) (2026-02-16)
 
 
