@@ -22,6 +22,7 @@ endef
 #################################################################################
 tidy:
 	$(call modules, go mod tidy)
+	go work sync
 
 generate:
 	buf generate
