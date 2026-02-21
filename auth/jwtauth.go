@@ -29,10 +29,10 @@ type Config struct {
 	Issuer string `envconfig:"AUTH_ISSUER"`
 
 	// Time-to-live for access tokens
-	AccessTokenTTL time.Duration `envconfig:"AUTH_ACCESS_TOKEN_TTL" default:"7d"`
+	AccessTokenTTL time.Duration `envconfig:"AUTH_ACCESS_TOKEN_TTL" default:"168h"` // 7 days
 
 	// Time-to-live for refresh tokens
-	RefreshTokenTTL time.Duration `envconfig:"AUTH_REFRESH_TOKEN_TTL" default:"30d"`
+	RefreshTokenTTL time.Duration `envconfig:"AUTH_REFRESH_TOKEN_TTL" default:"720h"` // 30 days
 }
 
 type Claim struct {
@@ -183,4 +183,3 @@ func WithClaims(ctx context.Context, claim *Claim) context.Context {
 	}
 	return ctx
 }
-
