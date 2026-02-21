@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/auth` will be documented in this file by Release Please.
 
+## [0.4.1](https://github.com/Jesse0Michael/pkg/compare/auth/v0.4.0...auth/v0.4.1) (2026-02-21)
+
+
+### Bug Fixes
+
+* correct duration config ([0e841ff](https://github.com/Jesse0Michael/pkg/commit/0e841ffb70a293b327c996ceff6b2726814e7917))
+
 ## [0.4.0](https://github.com/Jesse0Michael/pkg/compare/auth/v0.3.0...auth/v0.4.0) (2026-02-16)
 
 
