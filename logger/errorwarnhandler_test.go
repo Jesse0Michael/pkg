@@ -22,6 +22,7 @@ func ExampleErrorWarnHandler() {
 	os.Setenv("ENVIRONMENT", "test")
 	os.Setenv("HOSTNAME", "local")
 	os.Setenv("LOG_OUTPUT", "stderr")
+	os.Setenv("LOG_SOURCE", "false")
 	ctx := context.Background()
 	warnCheck := func(err error) bool { return err != nil && err.Error() == "warn" }
 
@@ -29,17 +30,17 @@ func ExampleErrorWarnHandler() {
 	NewLogger()
 	SetErrorWarnHandler(warnCheck)
 
-	slog.With("error", errors.New("error")).ErrorContext(ctx, "writing errors")
-	slog.With("error", errors.New("warn")).ErrorContext(ctx, "writing errors that should be warnings")
-	slog.Default().WithGroup("request").With("path", "/", "verb", "GET").With("error", errors.New("warn")).ErrorContext(ctx, "writing errors that should be warnings with group")
+	slog.ErrorContext(ctx, "writing errors", "error", errors.New("error"))
+	slog.ErrorContext(ctx, "writing errors that should be warnings", "error", errors.New("warn"))
+	slog.Default().WithGroup("request").With("path", "/", "verb", "GET").ErrorContext(ctx, "writing errors that should be warnings with group", "error", errors.New("warn"))
 
 	// Post process output
 	ReplaceTimestamps(f, os.Stdout)
 
 	// Output:
-	// {"time":"TIMESTAMP","level":"ERROR","msg":"writing errors","host":"local","environment":"test","error":"error"}
-	// {"time":"TIMESTAMP","level":"WARN","msg":"writing errors that should be warnings","host":"local","environment":"test","error":"warn"}
-	// {"time":"TIMESTAMP","level":"WARN","msg":"writing errors that should be warnings with group","host":"local","environment":"test","request":{"path":"/","verb":"GET","error":"warn"}}
+	// {"time":"TIMESTAMP","level":"ERROR","msg":"writing errors","host":"local","env":"test","error":"error"}
+	// {"time":"TIMESTAMP","level":"WARN","msg":"writing errors that should be warnings","host":"local","env":"test","error":"warn"}
+	// {"time":"TIMESTAMP","level":"WARN","msg":"writing errors that should be warnings with group","host":"local","env":"test","request":{"path":"/","verb":"GET","error":"warn"}}
 }
 
 func TestErrorWarnHandler_Handle(t *testing.T) {
@@ -72,6 +73,12 @@ func TestErrorWarnHandler_Handle(t *testing.T) {
 			attrs: []slog.Attr{slog.Any("error", errors.New("warn"))},
 			level: slog.LevelError,
 			log:   `{"level":"WARN","msg":"message","error":"warn"}`,
+		},
+		{
+			name:  "warn error with non-error key",
+			attrs: []slog.Attr{slog.Any("cause", errors.New("warn"))},
+			level: slog.LevelError,
+			log:   `{"level":"WARN","msg":"message","cause":"warn"}`,
 		},
 	}
 	for _, tt := range tests {

@@ -4,16 +4,15 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"strconv"
 	"strings"
 )
 
 // NewLogger sets and returns a new default logger.
 func NewLogger() *slog.Logger {
-	handler := NewContextHandler(
+	handler := NewBaggageHandler(
 		NewOtelHandler(
-			slog.NewJSONHandler(LogOutput(), &slog.HandlerOptions{
-				Level: LogLevel(),
-			}),
+			LogFormat(),
 		),
 	)
 
@@ -24,7 +23,7 @@ func NewLogger() *slog.Logger {
 		logger = logger.With("host", host)
 	}
 	if env, ok := os.LookupEnv("ENVIRONMENT"); ok {
-		logger = logger.With("environment", env)
+		logger = logger.With("env", env)
 	}
 
 	slog.SetDefault(logger)
@@ -32,6 +31,7 @@ func NewLogger() *slog.Logger {
 }
 
 // LogLevel returns the slog level from the LOG_LEVEL environment variable.
+// Defaults to INFO.
 func LogLevel() slog.Leveler {
 	switch strings.ToUpper(os.Getenv("LOG_LEVEL")) {
 	case "DEBUG":
@@ -46,6 +46,7 @@ func LogLevel() slog.Leveler {
 }
 
 // LogOutput returns the slog output from the LOG_OUTPUT environment variable.
+// Defaults to os.Stdout.
 func LogOutput() io.Writer {
 	switch strings.ToUpper(os.Getenv("LOG_OUTPUT")) {
 	case "STDOUT":
@@ -54,5 +55,32 @@ func LogOutput() io.Writer {
 		return os.Stderr
 	default:
 		return os.Stdout
+	}
+}
+
+// LogSource returns whether to include source information in logs from the LOG_SOURCE environment variable.
+// Defaults to true.
+func LogSource() bool {
+	value, err := strconv.ParseBool(os.Getenv("LOG_SOURCE"))
+	if err != nil {
+		return true
+	}
+	return value
+}
+
+// LogFormat returns the slog handler to use based on the LOG_FORMAT environment variable.
+// Defaults to JSON Handler.
+func LogFormat() slog.Handler {
+	switch strings.ToUpper(os.Getenv("LOG_FORMAT")) {
+	case "TEXT":
+		return slog.NewTextHandler(LogOutput(), &slog.HandlerOptions{
+			Level:     LogLevel(),
+			AddSource: LogSource(),
+		})
+	default:
+		return slog.NewJSONHandler(LogOutput(), &slog.HandlerOptions{
+			Level:     LogLevel(),
+			AddSource: LogSource(),
+		})
 	}
 }

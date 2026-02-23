@@ -29,6 +29,7 @@ func ExampleNewLogger() {
 	os.Setenv("ENVIRONMENT", "test")
 	os.Setenv("HOSTNAME", "local")
 	os.Setenv("LOG_OUTPUT", "stderr")
+	os.Setenv("LOG_SOURCE", "false")
 	ctx := context.Background()
 
 	// Example
@@ -41,8 +42,8 @@ func ExampleNewLogger() {
 	ReplaceTimestamps(f, os.Stdout)
 
 	// Output:
-	// {"time":"TIMESTAMP","level":"INFO","msg":"writing logs","host":"local","environment":"test","key":"value"}
-	// {"time":"TIMESTAMP","level":"ERROR","msg":"writing errors","host":"local","environment":"test","error":"error"}
+	// {"time":"TIMESTAMP","level":"INFO","msg":"writing logs","host":"local","env":"test","key":"value"}
+	// {"time":"TIMESTAMP","level":"ERROR","msg":"writing errors","host":"local","env":"test","error":"error"}
 }
 
 func TestNewLogger(t *testing.T) {
@@ -63,7 +64,7 @@ func TestNewLogger(t *testing.T) {
 				t.Setenv("ENVIRONMENT", "test")
 				t.Setenv("HOSTNAME", "local")
 			},
-			log: `{"level":"DEBUG","msg":"message","host":"local","environment":"test"}`,
+			log: `{"level":"DEBUG","msg":"message","host":"local","env":"test"}`,
 		},
 	}
 	for _, tt := range tests {
@@ -177,6 +178,80 @@ func Test_slogOut(t *testing.T) {
 			tt.setup()
 			if got := LogOutput(); !reflect.DeepEqual(got, tt.output) {
 				t.Errorf("slogOutput() = %v, want %v", got, tt.output)
+			}
+		})
+	}
+}
+
+func TestLogSource(t *testing.T) {
+	tests := []struct {
+		name   string
+		setup  func()
+		source bool
+	}{
+		{
+			name:   "log source: empty",
+			setup:  func() {},
+			source: true,
+		},
+		{
+			name: "log source: true",
+			setup: func() {
+				t.Setenv("LOG_SOURCE", "true")
+			},
+			source: true,
+		},
+		{
+			name: "log source: false",
+			setup: func() {
+				t.Setenv("LOG_SOURCE", "false")
+			},
+			source: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			os.Clearenv()
+			tt.setup()
+			if got := LogSource(); !reflect.DeepEqual(got, tt.source) {
+				t.Errorf("LogSource() = %v, want %v", got, tt.source)
+			}
+		})
+	}
+}
+
+func TestLogFormat(t *testing.T) {
+	tests := []struct {
+		name   string
+		setup  func()
+		format slog.Handler
+	}{
+		{
+			name:   "log format: empty",
+			setup:  func() {},
+			format: slog.NewJSONHandler(os.Stdout, nil),
+		},
+		{
+			name: "log format: JSON",
+			setup: func() {
+				t.Setenv("LOG_FORMAT", "JSON")
+			},
+			format: slog.NewJSONHandler(os.Stdout, nil),
+		},
+		{
+			name: "log format: TEXT",
+			setup: func() {
+				t.Setenv("LOG_FORMAT", "TEXT")
+			},
+			format: slog.NewTextHandler(os.Stdout, nil),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			os.Clearenv()
+			tt.setup()
+			if got := LogFormat(); reflect.TypeOf(got) != reflect.TypeOf(tt.format) {
+				t.Errorf("LogFormat() = %T, want %T", got, tt.format)
 			}
 		})
 	}

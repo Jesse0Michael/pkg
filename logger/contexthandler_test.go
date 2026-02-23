@@ -21,6 +21,7 @@ func ExampleContextHandler() {
 	os.Setenv("ENVIRONMENT", "test")
 	os.Setenv("HOSTNAME", "local")
 	os.Setenv("LOG_OUTPUT", "stderr")
+	os.Setenv("LOG_SOURCE", "false")
 	ctx := context.Background()
 
 	// Example
@@ -36,9 +37,9 @@ func ExampleContextHandler() {
 	ReplaceTimestamps(f, os.Stdout)
 
 	// Output:
-	// {"time":"TIMESTAMP","level":"INFO","msg":"writing logs","host":"local","environment":"test","accountID":"12345"}
-	// {"time":"TIMESTAMP","level":"INFO","msg":"writing logs with attributes","host":"local","environment":"test","key":"value","accountID":"12345"}
-	// {"time":"TIMESTAMP","level":"INFO","msg":"writing logs with group","host":"local","environment":"test","request":{"path":"/","verb":"GET","accountID":"12345"}}
+	// {"time":"TIMESTAMP","level":"INFO","msg":"writing logs","host":"local","env":"test","accountID":"12345"}
+	// {"time":"TIMESTAMP","level":"INFO","msg":"writing logs with attributes","host":"local","env":"test","key":"value","accountID":"12345"}
+	// {"time":"TIMESTAMP","level":"INFO","msg":"writing logs with group","host":"local","env":"test","request":{"path":"/","verb":"GET","accountID":"12345"}}
 }
 
 func TestContextHandler_Handle(t *testing.T) {
