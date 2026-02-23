@@ -1,6 +1,6 @@
 module github.com/jesse0michael/pkg/cache
 
-go 1.25.7
+go 1.26.0
 
 require (
 	github.com/alicebob/miniredis/v2 v2.35.0
@@ -24,7 +24,7 @@ require (
 	github.com/vmihailenco/msgpack/v5 v5.3.4 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
-	golang.org/x/net v0.48.0 // indirect
+	golang.org/x/net v0.49.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.40.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
 )

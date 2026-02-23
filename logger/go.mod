@@ -1,6 +1,6 @@
 module github.com/jesse0michael/pkg/logger
 
-go 1.25.7
+go 1.26.0
 
 require (
 	github.com/lib/pq v1.11.2

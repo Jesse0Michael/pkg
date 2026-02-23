@@ -1,6 +1,6 @@
 module github.com/jesse0michael/pkg/auth
 
-go 1.25.7
+go 1.26.0
 
 require (
 	github.com/golang-jwt/jwt/v5 v5.3.0
@@ -19,6 +19,6 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/otel/metric v1.40.0 // indirect
-	golang.org/x/sys v0.40.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
