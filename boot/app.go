@@ -39,6 +39,11 @@ func NewApp[T any]() *App[T] {
 			slog.ErrorContext(ctx, "failed to create otel resource", "err", err)
 			cancel(err)
 		}
+		_, err = config.OtelLogProvider(ctx, otelConfig, resource)
+		if err != nil {
+			slog.ErrorContext(ctx, "failed to create otel log provider", "err", err)
+			cancel(err)
+		}
 		_, err = config.OtelTraceProvider(ctx, otelConfig, resource)
 		if err != nil {
 			slog.ErrorContext(ctx, "failed to create otel trace provider", "err", err)

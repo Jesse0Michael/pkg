@@ -3,14 +3,18 @@ package config
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
+	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/contrib/instrumentation/host"
 	"go.opentelemetry.io/contrib/instrumentation/runtime"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
@@ -43,6 +47,16 @@ func (cfg OpenTelemetryConfig) TracerOptions() []otlptracegrpc.Option {
 	}
 	if cfg.OpenTelemetryInsecure {
 		opts = append(opts, otlptracegrpc.WithInsecure())
+	}
+	return opts
+}
+
+func (cfg OpenTelemetryConfig) LogOptions() []otlploggrpc.Option {
+	opts := []otlploggrpc.Option{
+		otlploggrpc.WithEndpoint(cfg.OpenTelemetryEndpoint),
+	}
+	if cfg.OpenTelemetryInsecure {
+		opts = append(opts, otlploggrpc.WithInsecure())
 	}
 	return opts
 }
@@ -112,4 +126,29 @@ func OtelMeterProvider(ctx context.Context, cfg OpenTelemetryConfig, r *resource
 		return mp, fmt.Errorf("failed to start host metric collection: %w", err)
 	}
 	return mp, nil
+}
+
+func OtelLogProvider(ctx context.Context, cfg OpenTelemetryConfig, r *resource.Resource) (*log.LoggerProvider, error) {
+	logExporter, err := otlploggrpc.New(ctx, cfg.LogOptions()...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create log exporter: %w", err)
+	}
+
+	provider := log.NewLoggerProvider(
+		log.WithResource(r),
+		log.WithProcessor(log.NewBatchProcessor(logExporter)),
+	)
+
+	handler := otelslog.NewHandler("",
+		otelslog.WithLoggerProvider(provider),
+		otelslog.WithSource(true),
+	)
+
+	slog.SetDefault(slog.New(
+		slog.NewMultiHandler(
+			handler,
+		),
+	))
+
+	return provider, nil
 }

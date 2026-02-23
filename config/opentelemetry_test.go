@@ -8,6 +8,7 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -91,6 +92,47 @@ func TestOpenTelemetryConfig_TracerOptions(t *testing.T) {
 				}
 			} else {
 				t.Errorf("OpenTelemetryConfig.TracerOptions() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestOpenTelemetryConfig_LogOptions(t *testing.T) {
+	tests := []struct {
+		name string
+		cfg  OpenTelemetryConfig
+		want []otlploggrpc.Option
+	}{
+		{
+			name: "empty config",
+			cfg:  OpenTelemetryConfig{},
+			want: []otlploggrpc.Option{
+				otlploggrpc.WithEndpoint(""),
+			},
+		},
+		{
+			name: "insecure config",
+			cfg: OpenTelemetryConfig{
+				OpenTelemetryEndpoint: "localhost:4317",
+				OpenTelemetryInsecure: true,
+			},
+			want: []otlploggrpc.Option{
+				otlploggrpc.WithEndpoint("localhost:4317"),
+				otlploggrpc.WithInsecure(),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.cfg.LogOptions(); len(tt.want) == len(got) {
+				for i, v := range tt.want {
+					fmt.Println(reflect.TypeOf(v))
+					if reflect.TypeOf(v) != reflect.TypeOf(got[i]) {
+						t.Errorf("OpenTelemetryConfig.LogOptions() = %v, want %v", got, tt.want)
+					}
+				}
+			} else {
+				t.Errorf("OpenTelemetryConfig.LogOptions() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -249,6 +291,39 @@ func TestOtelMeterProvider(t *testing.T) {
 				}
 			} else if got != nil {
 				t.Errorf("OtelMeterProvider() mp = %v, want %v", got, nil)
+			}
+		})
+	}
+}
+
+func TestOtelLogProvider(t *testing.T) {
+	tests := []struct {
+		name    string
+		cfg     OpenTelemetryConfig
+		wantErr bool
+	}{
+		{
+			name: "successful log provider",
+			cfg: OpenTelemetryConfig{
+				OpenTelemetryEndpoint: "localhost:4317",
+			},
+			wantErr: false,
+		},
+		{
+			name:    "empty config",
+			cfg:     OpenTelemetryConfig{},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := OtelLogProvider(t.Context(), tt.cfg, &resource.Resource{})
+			if (err != nil) != tt.wantErr {
+				t.Errorf("OtelLogProvider() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got == nil {
+				t.Errorf("OtelLogProvider() = %v, want non-nil", got)
 			}
 		})
 	}
