@@ -146,6 +146,7 @@ func OtelLogProvider(ctx context.Context, cfg OpenTelemetryConfig, r *resource.R
 
 	slog.SetDefault(slog.New(
 		slog.NewMultiHandler(
+			slog.Default().Handler(),
 			handler,
 		),
 	))
