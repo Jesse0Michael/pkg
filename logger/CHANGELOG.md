@@ -2,6 +2,14 @@
 
 All notable changes to `github.com/jesse0michael/pkg/logger` will be documented in this file by Release Please.
 
+## [0.4.0](https://github.com/Jesse0Michael/pkg/compare/logger/v0.3.0...logger/v0.4.0) (2026-02-23)
+
+
+### Features
+
+* add slog baggage handler ([96cf85c](https://github.com/Jesse0Michael/pkg/commit/96cf85c7c9c9aae38a55d361212a96aa8ef945df))
+* update package logger ([2814a4b](https://github.com/Jesse0Michael/pkg/commit/2814a4bd899a8e2df4a62f8918e1a27a36e88b29))
+
 ## [0.3.0](https://github.com/Jesse0Michael/pkg/compare/logger/v0.2.0...logger/v0.3.0) (2026-02-16)
 
 

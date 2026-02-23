@@ -2,6 +2,14 @@
 
 All notable changes to `github.com/jesse0michael/pkg/boot` will be documented in this file by Release Please.
 
+## [0.5.0](https://github.com/Jesse0Michael/pkg/compare/boot/v0.4.0...boot/v0.5.0) (2026-02-23)
+
+
+### Features
+
+* add OtelLogProvider ([ade8995](https://github.com/Jesse0Michael/pkg/commit/ade8995fff10b2010e8f29b3169e3f12086042a3))
+* shutdown providers ([7592be3](https://github.com/Jesse0Michael/pkg/commit/7592be39bb9bf3aac99336938882a6f6f3c64b0d))
+
 ## [0.4.0](https://github.com/Jesse0Michael/pkg/compare/boot/v0.3.0...boot/v0.4.0) (2026-02-18)
 
 

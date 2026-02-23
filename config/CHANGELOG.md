@@ -2,6 +2,14 @@
 
 All notable changes to `github.com/jesse0michael/pkg/config` will be documented in this file by Release Please.
 
+## [0.6.0](https://github.com/Jesse0Michael/pkg/compare/config/v0.5.0...config/v0.6.0) (2026-02-23)
+
+
+### Features
+
+* add OtelLogProvider ([ade8995](https://github.com/Jesse0Michael/pkg/commit/ade8995fff10b2010e8f29b3169e3f12086042a3))
+* support default slog handler ([e0afcac](https://github.com/Jesse0Michael/pkg/commit/e0afcac14ac7a8df609a8519a9dcb5db9c36fe83))
+
 ## [0.5.0](https://github.com/Jesse0Michael/pkg/compare/config/v0.4.0...config/v0.5.0) (2026-02-18)
 
 
