@@ -17,9 +17,10 @@ type Runner[T any] interface {
 }
 
 type App[T any] struct {
-	ctx    context.Context
-	cancel context.CancelCauseFunc
-	cfg    T
+	ctx     context.Context
+	cancel  context.CancelCauseFunc
+	cfg     T
+	closers []func(context.Context) error
 }
 
 func NewApp[T any]() *App[T] {
@@ -31,6 +32,12 @@ func NewApp[T any]() *App[T] {
 		cancel(err)
 	}
 
+	app := &App[T]{
+		ctx:    ctx,
+		cancel: cancel,
+		cfg:    cfg,
+	}
+
 	appConfig, hasApp := structHas[config.AppConfig](cfg)
 	otelConfig, hasOtel := structHas[config.OpenTelemetryConfig](cfg)
 	if hasApp && hasOtel {
@@ -39,29 +46,35 @@ func NewApp[T any]() *App[T] {
 			slog.ErrorContext(ctx, "failed to create otel resource", "err", err)
 			cancel(err)
 		}
-		_, err = config.OtelLogProvider(ctx, otelConfig, resource)
+
+		lp, err := config.OtelLogProvider(ctx, otelConfig, resource)
 		if err != nil {
 			slog.ErrorContext(ctx, "failed to create otel log provider", "err", err)
 			cancel(err)
+		} else {
+			app.closers = append(app.closers, lp.Shutdown)
 		}
-		_, err = config.OtelTraceProvider(ctx, otelConfig, resource)
+
+		tp, err := config.OtelTraceProvider(ctx, otelConfig, resource)
 		if err != nil {
 			slog.ErrorContext(ctx, "failed to create otel trace provider", "err", err)
 			cancel(err)
+		} else {
+			app.closers = append(app.closers, tp.Shutdown)
 		}
-		_, err = config.OtelMeterProvider(ctx, otelConfig, resource)
+
+		mp, err := config.OtelMeterProvider(ctx, otelConfig, resource)
 		if err != nil {
 			slog.ErrorContext(ctx, "failed to create otel meter provider", "err", err)
 			cancel(err)
+		} else {
+			app.closers = append(app.closers, mp.Shutdown)
 		}
+
 		slog.InfoContext(ctx, "OpenTelemetry initialized", "resource", resource)
 	}
 
-	return &App[T]{
-		ctx:    ctx,
-		cancel: cancel,
-		cfg:    cfg,
-	}
+	return app
 }
 
 func (a *App[T]) Context() context.Context {
@@ -94,6 +107,13 @@ func (a *App[T]) Run(runners ...Runner[T]) error {
 	if err := a.ctx.Err(); err != nil && !errors.Is(err, context.Canceled) {
 		slog.Error("app done with error", "error", err)
 		return err
+	}
+
+	shutdownCtx := context.Background()
+	for _, shutdown := range a.closers {
+		if err := shutdown(shutdownCtx); err != nil {
+			slog.Error("failed to shutdown provider", "err", err)
+		}
 	}
 
 	for _, r := range runners {
