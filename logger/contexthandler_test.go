@@ -20,12 +20,11 @@ func ExampleContextHandler() {
 	// Predefine environment
 	os.Setenv("ENVIRONMENT", "test")
 	os.Setenv("HOSTNAME", "local")
-	os.Setenv("LOG_OUTPUT", "stderr")
-	os.Setenv("LOG_SOURCE", "false")
 	ctx := context.Background()
 
 	// Example
-	NewLogger()
+	handler := NewContextHandler(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{}))
+	slog.SetDefault(slog.New(handler))
 
 	ctx = AddAttrs(ctx, slog.String("accountID", "12345"))
 
@@ -37,9 +36,9 @@ func ExampleContextHandler() {
 	ReplaceTimestamps(f, os.Stdout)
 
 	// Output:
-	// {"time":"TIMESTAMP","level":"INFO","msg":"writing logs","host":"local","env":"test","accountID":"12345"}
-	// {"time":"TIMESTAMP","level":"INFO","msg":"writing logs with attributes","host":"local","env":"test","key":"value","accountID":"12345"}
-	// {"time":"TIMESTAMP","level":"INFO","msg":"writing logs with group","host":"local","env":"test","request":{"path":"/","verb":"GET","accountID":"12345"}}
+	// {"time":"TIMESTAMP","level":"INFO","msg":"writing logs","accountID":"12345"}
+	// {"time":"TIMESTAMP","level":"INFO","msg":"writing logs with attributes","key":"value","accountID":"12345"}
+	// {"time":"TIMESTAMP","level":"INFO","msg":"writing logs with group","request":{"path":"/","verb":"GET","accountID":"12345"}}
 }
 
 func TestContextHandler_Handle(t *testing.T) {
