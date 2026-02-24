@@ -14,19 +14,19 @@ func TestAuthorization(t *testing.T) {
 	}{
 		{
 			name:   "authorization ID found",
-			ctx:    context.WithValue(context.TODO(), AuthorizationContextKey, "test-auth"),
+			ctx:    context.WithValue(t.Context(), AuthorizationContextKey, "test-auth"),
 			want:   "test-auth",
 			wantOK: true,
 		},
 		{
 			name:   "authorization ID invalid",
-			ctx:    context.WithValue(context.TODO(), AuthorizationContextKey, 12345),
+			ctx:    context.WithValue(t.Context(), AuthorizationContextKey, 12345),
 			want:   "",
 			wantOK: false,
 		},
 		{
 			name:   "authorization ID not found",
-			ctx:    context.TODO(),
+			ctx:    t.Context(),
 			want:   "",
 			wantOK: false,
 		},
@@ -53,19 +53,19 @@ func TestSubject(t *testing.T) {
 	}{
 		{
 			name:   "subject found",
-			ctx:    context.WithValue(context.TODO(), SubjectContextKey, "test-account"),
+			ctx:    context.WithValue(t.Context(), SubjectContextKey, "test-account"),
 			want:   "test-account",
 			wantOK: true,
 		},
 		{
 			name:   "subject invalid",
-			ctx:    context.WithValue(context.TODO(), SubjectContextKey, 12345),
+			ctx:    context.WithValue(t.Context(), SubjectContextKey, 12345),
 			want:   "",
 			wantOK: false,
 		},
 		{
 			name:   "subject not found",
-			ctx:    context.TODO(),
+			ctx:    t.Context(),
 			want:   "",
 			wantOK: false,
 		},
@@ -92,25 +92,25 @@ func TestAdmin(t *testing.T) {
 	}{
 		{
 			name:   "admin found - true",
-			ctx:    context.WithValue(context.TODO(), AdminContextKey, true),
+			ctx:    context.WithValue(t.Context(), AdminContextKey, true),
 			want:   true,
 			wantOK: true,
 		},
 		{
 			name:   "admin found - false",
-			ctx:    context.WithValue(context.TODO(), AdminContextKey, false),
+			ctx:    context.WithValue(t.Context(), AdminContextKey, false),
 			want:   false,
 			wantOK: true,
 		},
 		{
 			name:   "admin invalid",
-			ctx:    context.WithValue(context.TODO(), AdminContextKey, "truth"),
+			ctx:    context.WithValue(t.Context(), AdminContextKey, "truth"),
 			want:   false,
 			wantOK: false,
 		},
 		{
 			name:   "admin not found",
-			ctx:    context.TODO(),
+			ctx:    t.Context(),
 			want:   false,
 			wantOK: false,
 		},
@@ -137,25 +137,25 @@ func TestReadOnly(t *testing.T) {
 	}{
 		{
 			name:   "readOnly found - true",
-			ctx:    context.WithValue(context.TODO(), ReadOnlyContextKey, true),
+			ctx:    context.WithValue(t.Context(), ReadOnlyContextKey, true),
 			want:   true,
 			wantOK: true,
 		},
 		{
 			name:   "readOnly found - false",
-			ctx:    context.WithValue(context.TODO(), ReadOnlyContextKey, false),
+			ctx:    context.WithValue(t.Context(), ReadOnlyContextKey, false),
 			want:   false,
 			wantOK: true,
 		},
 		{
 			name:   "readOnly invalid",
-			ctx:    context.WithValue(context.TODO(), ReadOnlyContextKey, "truth"),
+			ctx:    context.WithValue(t.Context(), ReadOnlyContextKey, "truth"),
 			want:   false,
 			wantOK: false,
 		},
 		{
 			name:   "readOnly not found",
-			ctx:    context.TODO(),
+			ctx:    t.Context(),
 			want:   false,
 			wantOK: false,
 		},
@@ -182,19 +182,19 @@ func TestJTI(t *testing.T) {
 	}{
 		{
 			name:   "jti found",
-			ctx:    context.WithValue(context.TODO(), JTIContextKey, "test-jti"),
+			ctx:    context.WithValue(t.Context(), JTIContextKey, "test-jti"),
 			want:   "test-jti",
 			wantOK: true,
 		},
 		{
 			name:   "jti invalid",
-			ctx:    context.WithValue(context.TODO(), JTIContextKey, 12345),
+			ctx:    context.WithValue(t.Context(), JTIContextKey, 12345),
 			want:   "",
 			wantOK: false,
 		},
 		{
 			name:   "jti not found",
-			ctx:    context.TODO(),
+			ctx:    t.Context(),
 			want:   "",
 			wantOK: false,
 		},
@@ -222,37 +222,37 @@ func TestCheck(t *testing.T) {
 		{
 			name:    "empty context",
 			subject: "test-account",
-			ctx:     context.TODO(),
+			ctx:     t.Context(),
 			want:    false,
 		},
 		{
 			name:    "non admin",
 			subject: "test-account",
-			ctx:     context.WithValue(context.TODO(), AdminContextKey, false),
+			ctx:     context.WithValue(t.Context(), AdminContextKey, false),
 			want:    false,
 		},
 		{
 			name:    "admin",
 			subject: "test-account",
-			ctx:     context.WithValue(context.TODO(), AdminContextKey, true),
+			ctx:     context.WithValue(t.Context(), AdminContextKey, true),
 			want:    true,
 		},
 		{
 			name:    "empty subject",
 			subject: "",
-			ctx:     context.WithValue(context.TODO(), SubjectContextKey, ""),
+			ctx:     context.WithValue(t.Context(), SubjectContextKey, ""),
 			want:    false,
 		},
 		{
 			name:    "matching subject",
 			subject: "test-account",
-			ctx:     context.WithValue(context.TODO(), SubjectContextKey, "test-account"),
+			ctx:     context.WithValue(t.Context(), SubjectContextKey, "test-account"),
 			want:    true,
 		},
 		{
 			name:    "not matching subject",
 			subject: "test-account",
-			ctx:     context.WithValue(context.TODO(), SubjectContextKey, "non-account"),
+			ctx:     context.WithValue(t.Context(), SubjectContextKey, "non-account"),
 			want:    false,
 		},
 	}

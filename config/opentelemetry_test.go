@@ -1,7 +1,6 @@
 package config
 
 import (
-	"context"
 	"fmt"
 	"reflect"
 	"testing"
@@ -151,7 +150,7 @@ func Test_otelResource(t *testing.T) {
 			cfg:        AppConfig{},
 			attributes: []attribute.KeyValue{},
 			want: func() *resource.Resource {
-				r, _ := resource.New(context.TODO(),
+				r, _ := resource.New(t.Context(),
 					resource.WithAttributes(
 						semconv.ServiceName(""),
 						semconv.ServiceVersion(""),
@@ -168,7 +167,7 @@ func Test_otelResource(t *testing.T) {
 			cfg:        AppConfig{Environment: "local", Name: "app", Version: "1.0.0", LogLevel: "debug"},
 			attributes: []attribute.KeyValue{},
 			want: func() *resource.Resource {
-				r, _ := resource.New(context.TODO(),
+				r, _ := resource.New(t.Context(),
 					resource.WithAttributes(
 						semconv.ServiceName("app"),
 						semconv.ServiceVersion("1.0.0"),
@@ -185,7 +184,7 @@ func Test_otelResource(t *testing.T) {
 			cfg:        AppConfig{Environment: "local", Name: "app", Version: "1.0.0", LogLevel: "debug"},
 			attributes: []attribute.KeyValue{attribute.String("test.id", "test")},
 			want: func() *resource.Resource {
-				r, _ := resource.New(context.TODO(),
+				r, _ := resource.New(t.Context(),
 					resource.WithAttributes(
 						attribute.String("test.id", "test"),
 						semconv.ServiceName("app"),
@@ -201,7 +200,7 @@ func Test_otelResource(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := OtelResource(context.TODO(), tt.cfg, tt.attributes...)
+			got, err := OtelResource(t.Context(), tt.cfg, tt.attributes...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("OtelResource() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -237,7 +236,7 @@ func TestOtelTraceProvider(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := OtelTraceProvider(context.TODO(), tt.cfg, &resource.Resource{})
+			got, err := OtelTraceProvider(t.Context(), tt.cfg, &resource.Resource{})
 			if (err != nil) != tt.wantErr {
 				t.Errorf("OtelTraceProvider() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -279,7 +278,7 @@ func TestOtelMeterProvider(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &resource.Resource{}
-			got, err := OtelMeterProvider(context.TODO(), tt.cfg, r)
+			got, err := OtelMeterProvider(t.Context(), tt.cfg, r)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("OtelMeterProvider() error = %v, wantErr %v", err, tt.wantErr)
 				return

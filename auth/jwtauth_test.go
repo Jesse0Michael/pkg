@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"context"
 	"strings"
 	"testing"
 	"time"
@@ -531,7 +530,7 @@ func TestWithClaims(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := WithClaims(context.TODO(), tt.claim)
+			ctx := WithClaims(t.Context(), tt.claim)
 
 			subject, subjectOK := Subject(ctx)
 			require.Equal(t, tt.claim.Subject, subject)

@@ -24,7 +24,7 @@ func TestRedisBreaker_Set(t *testing.T) {
 	}{
 		{
 			name:         "cache control: no store",
-			ctx:          context.WithValue(context.TODO(), CacheControlContextKey, cachecontrol.Parse("no-store")),
+			ctx:          context.WithValue(t.Context(), CacheControlContextKey, cachecontrol.Parse("no-store")),
 			cfg:          Config{Enabled: true},
 			redisSetup:   func(rc *redis.Client) {},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
@@ -33,7 +33,7 @@ func TestRedisBreaker_Set(t *testing.T) {
 		},
 		{
 			name:         "redis disabled",
-			ctx:          context.TODO(),
+			ctx:          t.Context(),
 			cfg:          Config{Enabled: false},
 			redisSetup:   func(rc *redis.Client) {},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
@@ -42,7 +42,7 @@ func TestRedisBreaker_Set(t *testing.T) {
 		},
 		{
 			name:         "redis operation successful",
-			ctx:          context.TODO(),
+			ctx:          t.Context(),
 			cfg:          Config{Enabled: true},
 			redisSetup:   func(rc *redis.Client) {},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
@@ -51,7 +51,7 @@ func TestRedisBreaker_Set(t *testing.T) {
 		},
 		{
 			name:         "redis closed",
-			ctx:          context.TODO(),
+			ctx:          t.Context(),
 			cfg:          Config{Enabled: true},
 			redisSetup:   func(rc *redis.Client) { _ = rc.Close() },
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
@@ -60,7 +60,7 @@ func TestRedisBreaker_Set(t *testing.T) {
 		},
 		{
 			name:       "breaker open",
-			ctx:        context.TODO(),
+			ctx:        t.Context(),
 			cfg:        Config{Enabled: true},
 			redisSetup: func(rc *redis.Client) {},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {
@@ -104,7 +104,7 @@ func TestRedisBreaker_SetXX(t *testing.T) {
 	}{
 		{
 			name:         "cache control: no store",
-			ctx:          context.WithValue(context.TODO(), CacheControlContextKey, cachecontrol.Parse("no-store")),
+			ctx:          context.WithValue(t.Context(), CacheControlContextKey, cachecontrol.Parse("no-store")),
 			cfg:          Config{Enabled: true},
 			redisSetup:   func(rc *redis.Client) {},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
@@ -113,7 +113,7 @@ func TestRedisBreaker_SetXX(t *testing.T) {
 		},
 		{
 			name:         "redis disabled",
-			ctx:          context.TODO(),
+			ctx:          t.Context(),
 			cfg:          Config{Enabled: false},
 			redisSetup:   func(rc *redis.Client) {},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
@@ -122,7 +122,7 @@ func TestRedisBreaker_SetXX(t *testing.T) {
 		},
 		{
 			name:         "redis operation successful",
-			ctx:          context.TODO(),
+			ctx:          t.Context(),
 			cfg:          Config{Enabled: true},
 			redisSetup:   func(rc *redis.Client) {},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
@@ -131,7 +131,7 @@ func TestRedisBreaker_SetXX(t *testing.T) {
 		},
 		{
 			name:         "redis closed",
-			ctx:          context.TODO(),
+			ctx:          t.Context(),
 			cfg:          Config{Enabled: true},
 			redisSetup:   func(rc *redis.Client) { _ = rc.Close() },
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
@@ -140,7 +140,7 @@ func TestRedisBreaker_SetXX(t *testing.T) {
 		},
 		{
 			name:       "breaker open",
-			ctx:        context.TODO(),
+			ctx:        t.Context(),
 			cfg:        Config{Enabled: true},
 			redisSetup: func(rc *redis.Client) {},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {
@@ -184,7 +184,7 @@ func TestRedisBreaker_SetNX(t *testing.T) {
 	}{
 		{
 			name:         "cache control: no store",
-			ctx:          context.WithValue(context.TODO(), CacheControlContextKey, cachecontrol.Parse("no-store")),
+			ctx:          context.WithValue(t.Context(), CacheControlContextKey, cachecontrol.Parse("no-store")),
 			cfg:          Config{Enabled: true},
 			redisSetup:   func(rc *redis.Client) {},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
@@ -193,7 +193,7 @@ func TestRedisBreaker_SetNX(t *testing.T) {
 		},
 		{
 			name:         "redis disabled",
-			ctx:          context.TODO(),
+			ctx:          t.Context(),
 			cfg:          Config{Enabled: false},
 			redisSetup:   func(rc *redis.Client) {},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
@@ -202,7 +202,7 @@ func TestRedisBreaker_SetNX(t *testing.T) {
 		},
 		{
 			name:         "redis operation successful",
-			ctx:          context.TODO(),
+			ctx:          t.Context(),
 			cfg:          Config{Enabled: true},
 			redisSetup:   func(rc *redis.Client) {},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
@@ -211,7 +211,7 @@ func TestRedisBreaker_SetNX(t *testing.T) {
 		},
 		{
 			name:         "redis closed",
-			ctx:          context.TODO(),
+			ctx:          t.Context(),
 			cfg:          Config{Enabled: true},
 			redisSetup:   func(rc *redis.Client) { _ = rc.Close() },
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
@@ -220,7 +220,7 @@ func TestRedisBreaker_SetNX(t *testing.T) {
 		},
 		{
 			name:       "breaker open",
-			ctx:        context.TODO(),
+			ctx:        t.Context(),
 			cfg:        Config{Enabled: true},
 			redisSetup: func(rc *redis.Client) {},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {
@@ -264,7 +264,7 @@ func TestRedisBreaker_Get(t *testing.T) {
 	}{
 		{
 			name:         "cache control: no cache",
-			ctx:          context.WithValue(context.TODO(), CacheControlContextKey, cachecontrol.Parse("no-cache")),
+			ctx:          context.WithValue(t.Context(), CacheControlContextKey, cachecontrol.Parse("no-cache")),
 			cfg:          Config{Enabled: true},
 			redisSetup:   func(rc *redis.Client) {},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
@@ -273,7 +273,7 @@ func TestRedisBreaker_Get(t *testing.T) {
 		},
 		{
 			name:         "redis disabled",
-			ctx:          context.TODO(),
+			ctx:          t.Context(),
 			cfg:          Config{Enabled: false},
 			redisSetup:   func(rc *redis.Client) {},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
@@ -282,10 +282,10 @@ func TestRedisBreaker_Get(t *testing.T) {
 		},
 		{
 			name: "redis operation successful",
-			ctx:  context.TODO(),
+			ctx:  t.Context(),
 			cfg:  Config{Enabled: true},
 			redisSetup: func(rc *redis.Client) {
-				_ = rc.Set(context.TODO(), "test-key", "test-value", time.Hour)
+				_ = rc.Set(t.Context(), "test-key", "test-value", time.Hour)
 			},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
 			wantValue:    "test-value",
@@ -293,7 +293,7 @@ func TestRedisBreaker_Get(t *testing.T) {
 		},
 		{
 			name: "redis operation - missed",
-			ctx:  context.TODO(),
+			ctx:  t.Context(),
 			cfg:  Config{Enabled: true},
 			redisSetup: func(rc *redis.Client) {
 			},
@@ -303,7 +303,7 @@ func TestRedisBreaker_Get(t *testing.T) {
 		},
 		{
 			name:         "redis closed",
-			ctx:          context.TODO(),
+			ctx:          t.Context(),
 			cfg:          Config{Enabled: true},
 			redisSetup:   func(rc *redis.Client) { _ = rc.Close() },
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
@@ -312,7 +312,7 @@ func TestRedisBreaker_Get(t *testing.T) {
 		},
 		{
 			name:       "breaker open",
-			ctx:        context.TODO(),
+			ctx:        t.Context(),
 			cfg:        Config{Enabled: true},
 			redisSetup: func(rc *redis.Client) {},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {
@@ -359,7 +359,7 @@ func TestRedisBreaker_Del(t *testing.T) {
 	}{
 		{
 			name:         "redis disabled",
-			ctx:          context.TODO(),
+			ctx:          t.Context(),
 			cfg:          Config{Enabled: false},
 			redisSetup:   func(rc *redis.Client) {},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
@@ -368,10 +368,10 @@ func TestRedisBreaker_Del(t *testing.T) {
 		},
 		{
 			name: "redis operation successful",
-			ctx:  context.TODO(),
+			ctx:  t.Context(),
 			cfg:  Config{Enabled: true},
 			redisSetup: func(rc *redis.Client) {
-				_ = rc.Set(context.TODO(), "test-key", "test-value", time.Hour)
+				_ = rc.Set(t.Context(), "test-key", "test-value", time.Hour)
 			},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
 			wantValue:    1,
@@ -379,7 +379,7 @@ func TestRedisBreaker_Del(t *testing.T) {
 		},
 		{
 			name:         "redis operation successful - missing value",
-			ctx:          context.TODO(),
+			ctx:          t.Context(),
 			cfg:          Config{Enabled: true},
 			redisSetup:   func(rc *redis.Client) {},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
@@ -388,7 +388,7 @@ func TestRedisBreaker_Del(t *testing.T) {
 		},
 		{
 			name:         "redis closed",
-			ctx:          context.TODO(),
+			ctx:          t.Context(),
 			cfg:          Config{Enabled: true},
 			redisSetup:   func(rc *redis.Client) { _ = rc.Close() },
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {},
@@ -397,7 +397,7 @@ func TestRedisBreaker_Del(t *testing.T) {
 		},
 		{
 			name:       "breaker open",
-			ctx:        context.TODO(),
+			ctx:        t.Context(),
 			cfg:        Config{Enabled: true},
 			redisSetup: func(rc *redis.Client) {},
 			breakerSetup: func(b *gobreaker.CircuitBreaker) {

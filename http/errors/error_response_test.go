@@ -193,14 +193,14 @@ func TestWriteError(t *testing.T) {
 		},
 		{
 			name:     "standard error",
-			ctx:      context.Background(),
+			ctx:      t.Context(),
 			errs:     []error{errors.New("test-error")},
 			wantCode: http.StatusInternalServerError,
 			wantBody: `{"requestID":"80f198ee56343ba864fe8b2a57d3eff7","errors":[{"message":"Internal Server Error"}]}`,
 		},
 		{
 			name:     "error with status code",
-			ctx:      context.Background(),
+			ctx:      t.Context(),
 			errs:     []error{&Error{Message: "bad request", Details: "invalid request", Code: http.StatusBadRequest}},
 			wantCode: http.StatusBadRequest,
 			wantBody: `{"requestID":"80f198ee56343ba864fe8b2a57d3eff7","errors":[{"message":"bad request","details":"invalid request"}]}`,

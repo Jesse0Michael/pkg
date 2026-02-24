@@ -85,7 +85,7 @@ func TestNewLogger(t *testing.T) {
 			tt.setup()
 			NewLogger()
 
-			_ = slog.Default().Handler().Handle(context.TODO(), slog.NewRecord(time.Time{}, slog.LevelDebug, "message", 0))
+			_ = slog.Default().Handler().Handle(t.Context(), slog.NewRecord(time.Time{}, slog.LevelDebug, "message", 0))
 			_, _ = f.Seek(0, 0)
 			b, _ := io.ReadAll(f)
 			if !reflect.DeepEqual(tt.log, strings.TrimSpace((string(b)))) {

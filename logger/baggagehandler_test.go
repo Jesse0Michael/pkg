@@ -53,7 +53,7 @@ func TestBaggageHandler_Handle(t *testing.T) {
 	}{
 		{
 			name: "no baggage",
-			ctx:  context.TODO(),
+			ctx:  t.Context(),
 			log:  `{"level":"DEBUG","msg":"message"}`,
 		},
 		{
@@ -61,7 +61,7 @@ func TestBaggageHandler_Handle(t *testing.T) {
 			ctx: func() context.Context {
 				m, _ := baggage.NewMember("accountID", "12345")
 				b, _ := baggage.New(m)
-				return baggage.ContextWithBaggage(context.TODO(), b)
+				return baggage.ContextWithBaggage(t.Context(), b)
 			}(),
 			log: `{"level":"DEBUG","msg":"message","accountID":"12345"}`,
 		},

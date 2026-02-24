@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -41,9 +40,9 @@ func TestTagParams(t *testing.T) {
 	for i := range tests {
 		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.TODO()
+			ctx := t.Context()
 			if tt.span {
-				ctx, _ = otel.Tracer("test").Start(context.TODO(), "test")
+				ctx, _ = otel.Tracer("test").Start(t.Context(), "test")
 			}
 
 			w := httptest.NewRecorder()

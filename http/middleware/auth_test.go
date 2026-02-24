@@ -83,7 +83,7 @@ func TestRejectReadOnly(t *testing.T) {
 	}{
 		{
 			name: "not read only",
-			ctx:  context.WithValue(context.TODO(), auth.ReadOnlyContextKey, false),
+			ctx:  context.WithValue(t.Context(), auth.ReadOnlyContextKey, false),
 			next: func(w http.ResponseWriter, r *http.Request) {
 				_, _ = w.Write([]byte(`{"message": "Success"}`))
 			},
@@ -92,7 +92,7 @@ func TestRejectReadOnly(t *testing.T) {
 		},
 		{
 			name: "missing read only",
-			ctx:  context.TODO(),
+			ctx:  t.Context(),
 			next: func(w http.ResponseWriter, r *http.Request) {
 				_, _ = w.Write([]byte(`{"message": "Success"}`))
 			},
@@ -101,7 +101,7 @@ func TestRejectReadOnly(t *testing.T) {
 		},
 		{
 			name: "read only rejected",
-			ctx:  context.WithValue(context.TODO(), auth.ReadOnlyContextKey, true),
+			ctx:  context.WithValue(t.Context(), auth.ReadOnlyContextKey, true),
 			next: func(w http.ResponseWriter, r *http.Request) {
 				_, _ = w.Write([]byte(`{"message": "Success"}`))
 			},

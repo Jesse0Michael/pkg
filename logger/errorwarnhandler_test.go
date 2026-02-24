@@ -90,7 +90,7 @@ func TestErrorWarnHandler_Handle(t *testing.T) {
 				func(err error) bool { return err.Error() == "warn" })
 			record := slog.NewRecord(time.Time{}, tt.level, "message", 0)
 			record.AddAttrs(tt.attrs...)
-			_ = h.Handle(context.TODO(), record)
+			_ = h.Handle(t.Context(), record)
 
 			_, _ = f.Seek(0, 0)
 			b, _ := io.ReadAll(f)

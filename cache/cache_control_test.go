@@ -15,22 +15,22 @@ func TestNoCache(t *testing.T) {
 	}{
 		{
 			name: "cache control not found",
-			ctx:  context.TODO(),
+			ctx:  t.Context(),
 			want: false,
 		},
 		{
 			name: "cache control wrong type",
-			ctx:  context.WithValue(context.TODO(), CacheControlContextKey, false),
+			ctx:  context.WithValue(t.Context(), CacheControlContextKey, false),
 			want: false,
 		},
 		{
 			name: "cache control without no cache",
-			ctx:  context.WithValue(context.TODO(), CacheControlContextKey, cachecontrol.CacheControl{}),
+			ctx:  context.WithValue(t.Context(), CacheControlContextKey, cachecontrol.CacheControl{}),
 			want: false,
 		},
 		{
 			name: "cache control with no cache",
-			ctx:  context.WithValue(context.TODO(), CacheControlContextKey, cachecontrol.Parse("no-cache")),
+			ctx:  context.WithValue(t.Context(), CacheControlContextKey, cachecontrol.Parse("no-cache")),
 			want: true,
 		},
 	}
@@ -52,22 +52,22 @@ func TestNoStore(t *testing.T) {
 	}{
 		{
 			name: "cache control not found",
-			ctx:  context.TODO(),
+			ctx:  t.Context(),
 			want: false,
 		},
 		{
 			name: "cache control wrong type",
-			ctx:  context.WithValue(context.TODO(), CacheControlContextKey, false),
+			ctx:  context.WithValue(t.Context(), CacheControlContextKey, false),
 			want: false,
 		},
 		{
 			name: "cache control without no store",
-			ctx:  context.WithValue(context.TODO(), CacheControlContextKey, cachecontrol.CacheControl{}),
+			ctx:  context.WithValue(t.Context(), CacheControlContextKey, cachecontrol.CacheControl{}),
 			want: false,
 		},
 		{
 			name: "cache control with no store",
-			ctx:  context.WithValue(context.TODO(), CacheControlContextKey, cachecontrol.Parse("no-store")),
+			ctx:  context.WithValue(t.Context(), CacheControlContextKey, cachecontrol.Parse("no-store")),
 			want: true,
 		},
 	}

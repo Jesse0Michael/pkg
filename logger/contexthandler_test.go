@@ -49,22 +49,22 @@ func TestContextHandler_Handle(t *testing.T) {
 	}{
 		{
 			name: "nil context",
-			ctx:  context.TODO(),
+			ctx:  t.Context(),
 			log:  `{"level":"DEBUG","msg":"message"}`,
 		},
 		{
 			name: "empty context",
-			ctx:  context.WithValue(context.TODO(), contextHandlerKey, map[string]any{}),
+			ctx:  context.WithValue(t.Context(), contextHandlerKey, map[string]any{}),
 			log:  `{"level":"DEBUG","msg":"message"}`,
 		},
 		{
 			name: "attr context",
-			ctx:  context.WithValue(context.TODO(), contextHandlerKey, map[string]any{"key": "value"}),
+			ctx:  context.WithValue(t.Context(), contextHandlerKey, map[string]any{"key": "value"}),
 			log:  `{"level":"DEBUG","msg":"message","key":"value"}`,
 		},
 		{
 			name: "invalid context",
-			ctx:  context.WithValue(context.TODO(), contextHandlerKey, true),
+			ctx:  context.WithValue(t.Context(), contextHandlerKey, true),
 			log:  `{"level":"DEBUG","msg":"message"}`,
 		},
 	}
@@ -96,7 +96,7 @@ func TestAddAttrs(t *testing.T) {
 	}{
 		{
 			name:  "nil context",
-			ctx:   context.TODO(),
+			ctx:   t.Context(),
 			attrs: []slog.Attr{slog.String("key", "value")},
 			want: map[string]any{
 				"key": "value",
@@ -104,7 +104,7 @@ func TestAddAttrs(t *testing.T) {
 		},
 		{
 			name:  "empty context",
-			ctx:   context.WithValue(context.TODO(), contextHandlerKey, map[string]any{}),
+			ctx:   context.WithValue(t.Context(), contextHandlerKey, map[string]any{}),
 			attrs: []slog.Attr{slog.String("key", "value")},
 			want: map[string]any{
 				"key": "value",
@@ -112,7 +112,7 @@ func TestAddAttrs(t *testing.T) {
 		},
 		{
 			name:  "invalid context",
-			ctx:   context.WithValue(context.TODO(), contextHandlerKey, true),
+			ctx:   context.WithValue(t.Context(), contextHandlerKey, true),
 			attrs: []slog.Attr{slog.String("key", "value")},
 			want: map[string]any{
 				"key": "value",
@@ -120,7 +120,7 @@ func TestAddAttrs(t *testing.T) {
 		},
 		{
 			name:  "attr context",
-			ctx:   context.WithValue(context.TODO(), contextHandlerKey, map[string]any{"key": "old", "other": "thing"}),
+			ctx:   context.WithValue(t.Context(), contextHandlerKey, map[string]any{"key": "old", "other": "thing"}),
 			attrs: []slog.Attr{slog.String("key", "value")},
 			want: map[string]any{
 				"key":   "value",

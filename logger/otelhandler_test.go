@@ -37,14 +37,14 @@ func TestOtelHandler_Handle(t *testing.T) {
 	}{
 		{
 			name: "nil context",
-			ctx:  context.TODO(),
+			ctx:  t.Context(),
 			log:  `{"level":"DEBUG","msg":"message"}`,
 		},
 		{
 			name: "empty context",
 			ctx: func() context.Context {
 
-				ctx, _ := tracesdk.NewTracerProvider(tracesdk.WithIDGenerator(&MockIDGenerator{}), tracesdk.WithSpanProcessor(tracetest.NewSpanRecorder())).Tracer("test").Start(context.TODO(), "test")
+				ctx, _ := tracesdk.NewTracerProvider(tracesdk.WithIDGenerator(&MockIDGenerator{}), tracesdk.WithSpanProcessor(tracetest.NewSpanRecorder())).Tracer("test").Start(t.Context(), "test")
 				return ctx
 			}(),
 			log: `{"level":"DEBUG","msg":"message","trace_id":"0102030405060708090a0b0c0d0e0f10","span_id":"0102030405060708"}`,

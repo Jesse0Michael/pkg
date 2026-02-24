@@ -23,12 +23,12 @@ func TestWithSpan(t *testing.T) {
 	}{
 		{
 			name: "empty context",
-			ctx:  context.TODO(),
+			ctx:  t.Context(),
 		},
 		{
 			name: "with all values",
 			ctx: func() context.Context {
-				ctx := context.WithValue(context.TODO(), SubjectContextKey, "test-subject")
+				ctx := context.WithValue(t.Context(), SubjectContextKey, "test-subject")
 				ctx = context.WithValue(ctx, AdminContextKey, true)
 				ctx = context.WithValue(ctx, ReadOnlyContextKey, true)
 				return ctx
