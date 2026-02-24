@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/boot` will be documented in this file by Release Please.
 
+## [0.6.0](https://github.com/Jesse0Michael/pkg/compare/boot/v0.5.1...boot/v0.6.0) (2026-02-24)
+
+
+### Features
+
+* setup open telemetry ([3b2fee8](https://github.com/Jesse0Michael/pkg/commit/3b2fee8401fe6379f560999724910589fe7cadc9))
+
 ## [0.5.1](https://github.com/Jesse0Michael/pkg/compare/boot/v0.5.0...boot/v0.5.1) (2026-02-24)
 
 
