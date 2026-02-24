@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/boot` will be documented in this file by Release Please.
 
+## [0.5.1](https://github.com/Jesse0Michael/pkg/compare/boot/v0.5.0...boot/v0.5.1) (2026-02-24)
+
+
+### Bug Fixes
+
+* reorder app Run ([b344b63](https://github.com/Jesse0Michael/pkg/commit/b344b63976927872f701d89185d73993f8dce9af))
+
 ## [0.5.0](https://github.com/Jesse0Michael/pkg/compare/boot/v0.4.0...boot/v0.5.0) (2026-02-23)
 
 
