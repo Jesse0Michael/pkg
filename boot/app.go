@@ -100,6 +100,7 @@ func (a *App[T]) Run(runners ...Runner[T]) error {
 			}
 		}(runner)
 	}
+	wg.Wait()
 
 	handlers.ServeHealthCheckMetrics(a.ctx)
 
@@ -109,18 +110,17 @@ func (a *App[T]) Run(runners ...Runner[T]) error {
 		return err
 	}
 
-	shutdownCtx := context.Background()
+	for _, r := range runners {
+		r.Close()
+	}
+
 	for _, shutdown := range a.closers {
+		shutdownCtx := context.Background()
 		if err := shutdown(shutdownCtx); err != nil {
 			slog.Error("failed to shutdown provider", "err", err)
 		}
 	}
 
-	for _, r := range runners {
-		r.Close()
-	}
-
-	wg.Wait()
 	slog.Info("exiting")
 	return nil
 }
