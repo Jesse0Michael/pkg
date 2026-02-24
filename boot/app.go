@@ -41,37 +41,13 @@ func NewApp[T any]() *App[T] {
 	appConfig, hasApp := structHas[config.AppConfig](cfg)
 	otelConfig, hasOtel := structHas[config.OpenTelemetryConfig](cfg)
 	if hasApp && hasOtel {
-		resource, err := config.OtelResource(ctx, appConfig)
+		res, lp, tp, mp, err := SetupOpenTelemetry(ctx, appConfig, otelConfig)
 		if err != nil {
-			slog.ErrorContext(ctx, "failed to create otel resource", "err", err)
-			cancel(err)
-		}
-
-		lp, err := config.OtelLogProvider(ctx, otelConfig, resource)
-		if err != nil {
-			slog.ErrorContext(ctx, "failed to create otel log provider", "err", err)
 			cancel(err)
 		} else {
-			app.closers = append(app.closers, lp.Shutdown)
+			app.closers = append(app.closers, lp.Shutdown, tp.Shutdown, mp.Shutdown)
+			slog.InfoContext(ctx, "OpenTelemetry initialized", "resource", res)
 		}
-
-		tp, err := config.OtelTraceProvider(ctx, otelConfig, resource)
-		if err != nil {
-			slog.ErrorContext(ctx, "failed to create otel trace provider", "err", err)
-			cancel(err)
-		} else {
-			app.closers = append(app.closers, tp.Shutdown)
-		}
-
-		mp, err := config.OtelMeterProvider(ctx, otelConfig, resource)
-		if err != nil {
-			slog.ErrorContext(ctx, "failed to create otel meter provider", "err", err)
-			cancel(err)
-		} else {
-			app.closers = append(app.closers, mp.Shutdown)
-		}
-
-		slog.InfoContext(ctx, "OpenTelemetry initialized", "resource", resource)
 	}
 
 	return app
