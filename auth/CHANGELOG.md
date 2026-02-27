@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/auth` will be documented in this file by Release Please.
 
+## [0.4.2](https://github.com/Jesse0Michael/pkg/compare/auth/v0.4.1...auth/v0.4.2) (2026-02-27)
+
+
+### Bug Fixes
+
+* key is bytes ([633e792](https://github.com/Jesse0Michael/pkg/commit/633e792ed4e1135a2f31484761fb5fa0d08af8d8))
+
 ## [0.4.1](https://github.com/Jesse0Michael/pkg/compare/auth/v0.4.0...auth/v0.4.1) (2026-02-21)
 
 
