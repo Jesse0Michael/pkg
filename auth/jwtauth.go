@@ -23,7 +23,7 @@ var (
 
 type Config struct {
 	// SecretKey used for signing tokens (required)
-	SecretKey any `envconfig:"AUTH_SECRET_KEY" required:"true"`
+	SecretKey []byte `envconfig:"AUTH_SECRET_KEY" required:"true"`
 
 	// Issuer claim to include in tokens
 	Issuer string `envconfig:"AUTH_ISSUER"`

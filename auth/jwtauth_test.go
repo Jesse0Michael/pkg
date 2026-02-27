@@ -12,7 +12,7 @@ import (
 
 func TestNewAuthService(t *testing.T) {
 	cfg := Config{
-		SecretKey:       "test-secret",
+		SecretKey:       []byte("test-secret"),
 		Issuer:          "test-issuer",
 		AccessTokenTTL:  time.Minute * 15,
 		RefreshTokenTTL: time.Hour * 24 * 7,
@@ -439,7 +439,7 @@ func TestWithInvalidConfig(t *testing.T) {
 		{
 			name: "empty signing secret",
 			cfg: Config{
-				SecretKey:       "",
+				SecretKey:       nil,
 				Issuer:          "test-issuer",
 				AccessTokenTTL:  time.Minute * 15,
 				RefreshTokenTTL: time.Hour * 24,
@@ -459,7 +459,7 @@ func TestWithInvalidConfig(t *testing.T) {
 		{
 			name: "zero TTLs",
 			cfg: Config{
-				SecretKey:       "test-secret",
+				SecretKey:       []byte("test-secret"),
 				Issuer:          "test-issuer",
 				AccessTokenTTL:  0,
 				RefreshTokenTTL: 0,
