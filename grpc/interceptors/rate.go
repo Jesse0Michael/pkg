@@ -20,14 +20,12 @@ type RateLimitConfig struct {
 	// Default ~1.67/s = 100 requests per minute.
 	Rate rate.Limit `envconfig:"RATE_LIMIT_RATE" default:"1.67"`
 	// Burst is the maximum burst size for authenticated users.
-	// Covers parallel RPCs during app initialization.
-	Burst int `envconfig:"RATE_LIMIT_BURST" default:"20"`
+	Burst int `envconfig:"RATE_LIMIT_BURST" default:"100"`
 	// NoAuthRate is the token refill rate for unauthenticated requests,
 	// keyed by peer address. Default ~0.17/s = 10 requests per minute.
 	NoAuthRate rate.Limit `envconfig:"RATE_LIMIT_NO_AUTH_RATE" default:"0.17"`
-	// NoAuthBurst is the maximum burst size for unauthenticated requests,
-	// keyed by peer address. Allows a small retry cluster.
-	NoAuthBurst int `envconfig:"RATE_LIMIT_NO_AUTH_BURST" default:"5"`
+	// NoAuthBurst is the maximum burst size for unauthenticated requests, keyed by peer address.
+	NoAuthBurst int `envconfig:"RATE_LIMIT_NO_AUTH_BURST" default:"20"`
 }
 
 // RateLimiter provides in-memory rate limiting for gRPC RPCs.
