@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/auth` will be documented in this file by Release Please.
 
+## [0.4.3](https://github.com/Jesse0Michael/pkg/compare/auth/v0.4.2...auth/v0.4.3) (2026-03-05)
+
+
+### Bug Fixes
+
+* update auth handlers ([c3fd7e9](https://github.com/Jesse0Michael/pkg/commit/c3fd7e939e87fef2299b5f9154ddc92604c6c0ea))
+
 ## [0.4.2](https://github.com/Jesse0Michael/pkg/compare/auth/v0.4.1...auth/v0.4.2) (2026-02-27)
 
 
