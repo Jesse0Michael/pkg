@@ -257,16 +257,6 @@ func TestHasNoAuth(t *testing.T) {
 			fullMethod: "garbage",
 			want:       false,
 		},
-		{
-			name:       "grpc health service exempt",
-			fullMethod: "/grpc.health.v1.Health/Check",
-			want:       true,
-		},
-		{
-			name:       "grpc reflection service exempt",
-			fullMethod: "/grpc.reflection.v1.ServerReflection/ServerReflectionInfo",
-			want:       true,
-		},
 	}
 
 	for _, tt := range tests {

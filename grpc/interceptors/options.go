@@ -59,12 +59,7 @@ func ServiceBoolOption(sd protoreflect.ServiceDescriptor, ext *protoimpl.Extensi
 }
 
 // HasNoAuth returns true if the method or its parent service opts out of authentication.
-// gRPC well-known system services (health, reflection) are always exempt.
 func HasNoAuth(fullMethod string) bool {
-	// Exempt gRPC system services that must be accessible without credentials.
-	if strings.HasPrefix(fullMethod, "/grpc.health.") || strings.HasPrefix(fullMethod, "/grpc.reflection.") {
-		return true
-	}
 	sd, md := ResolveMethod(fullMethod)
 	return MethodBoolOption(md, options.E_NoAuth) || ServiceBoolOption(sd, options.E_ServiceNoAuth)
 }
