@@ -39,6 +39,7 @@ func WithReadOnly() TokenOption {
 	}
 }
 
+// applyTokenOptions applies all provided options to a zero-value tokenParams.
 func applyTokenOptions(opts []TokenOption) tokenParams {
 	var p tokenParams
 	for _, opt := range opts {

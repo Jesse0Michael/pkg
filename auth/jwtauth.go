@@ -106,7 +106,7 @@ func (a *JWTAuth) generateToken(p tokenParams, tokenType string, ttl time.Durati
 // VerifyToken validates a token and returns the claims
 func (a *JWTAuth) VerifyToken(tokenString, expectedType string) (*Claim, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &Claim{},
-		func(token *jwt.Token) (interface{}, error) {
+		func(token *jwt.Token) (any, error) {
 			if token.Method != a.signingMethod {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
@@ -137,18 +137,18 @@ func (a *JWTAuth) VerifyToken(tokenString, expectedType string) (*Claim, error) 
 }
 
 // VerifyAccessToken specifically validates access tokens
-func (s *JWTAuth) VerifyAccessToken(token string) (*Claim, error) {
-	return s.VerifyToken(token, AccessTokenType)
+func (a *JWTAuth) VerifyAccessToken(token string) (*Claim, error) {
+	return a.VerifyToken(token, AccessTokenType)
 }
 
 // VerifyRefreshToken specifically validates refresh tokens
-func (s *JWTAuth) VerifyRefreshToken(token string) (*Claim, error) {
-	return s.VerifyToken(token, RefreshTokenType)
+func (a *JWTAuth) VerifyRefreshToken(token string) (*Claim, error) {
+	return a.VerifyToken(token, RefreshTokenType)
 }
 
 // RefreshTokens validates a refresh token and issues new access and refresh tokens
-func (s *JWTAuth) RefreshTokens(token string) (string, string, error) {
-	claims, err := s.VerifyRefreshToken(token)
+func (a *JWTAuth) RefreshTokens(token string) (string, string, error) {
+	claims, err := a.VerifyRefreshToken(token)
 	if err != nil {
 		return "", "", err
 	}
@@ -164,7 +164,7 @@ func (s *JWTAuth) RefreshTokens(token string) (string, string, error) {
 		opts = append(opts, WithAudience(claims.Audience...))
 	}
 
-	return s.GenerateTokens(opts...)
+	return a.GenerateTokens(opts...)
 }
 
 // WithClaims sets identifying information from the claims into the context

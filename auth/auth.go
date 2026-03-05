@@ -6,12 +6,14 @@ import (
 
 type contextKey string
 
-const AuthorizationContextKey = contextKey("authorization")
-const SubjectContextKey = contextKey("subject")
-const AdminContextKey = contextKey("admin")
-const ReadOnlyContextKey = contextKey("readOnly")
-const JTIContextKey = contextKey("jti")
-const RequestContextKey = contextKey("request")
+const (
+	AuthorizationContextKey = contextKey("authorization")
+	SubjectContextKey       = contextKey("subject")
+	AdminContextKey         = contextKey("admin")
+	ReadOnlyContextKey      = contextKey("readOnly")
+	JTIContextKey           = contextKey("jti")
+	RequestContextKey       = contextKey("request")
+)
 
 func Authorization(ctx context.Context) (string, bool) {
 	val, ok := ctx.Value(AuthorizationContextKey).(string)
@@ -42,7 +44,7 @@ func Check(ctx context.Context, subject string) bool {
 	if admin, ok := Admin(ctx); admin && ok {
 		return true
 	}
-	if sub, ok := Subject(ctx); subject != "" && subject == sub && ok {
+	if sub, ok := Subject(ctx); ok && subject != "" && subject == sub {
 		return true
 	}
 	return false
