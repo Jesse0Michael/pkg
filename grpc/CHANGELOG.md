@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/Jesse0Michael/pkg/compare/grpc/v1.3.1...grpc/v1.3.2) (2026-03-05)
+
+
+### Bug Fixes
+
+* update method cut ([a6871a9](https://github.com/Jesse0Michael/pkg/commit/a6871a9a9a94d6d7a70269f03540733fe50c2793))
+
 ## [1.3.1](https://github.com/Jesse0Michael/pkg/compare/grpc/v1.3.0...grpc/v1.3.1) (2026-02-18)
 
 
