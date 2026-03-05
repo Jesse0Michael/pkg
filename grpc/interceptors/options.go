@@ -14,12 +14,12 @@ import (
 // ResolveMethod parses a gRPC full method name and returns the service and
 // method descriptors from the global proto registry.
 func ResolveMethod(fullMethod string) (protoreflect.ServiceDescriptor, protoreflect.MethodDescriptor) {
-	parts := strings.Split(strings.TrimPrefix(fullMethod, "/"), "/")
-	if len(parts) != 2 {
+	serviceName, methodName, ok := strings.Cut(strings.TrimPrefix(fullMethod, "/"), "/")
+	if !ok {
 		return nil, nil
 	}
 
-	desc, err := protoregistry.GlobalFiles.FindDescriptorByName(protoreflect.FullName(parts[0]))
+	desc, err := protoregistry.GlobalFiles.FindDescriptorByName(protoreflect.FullName(serviceName))
 	if err != nil {
 		return nil, nil
 	}
@@ -29,7 +29,7 @@ func ResolveMethod(fullMethod string) (protoreflect.ServiceDescriptor, protorefl
 		return nil, nil
 	}
 
-	return serviceDesc, serviceDesc.Methods().ByName(protoreflect.Name(parts[1]))
+	return serviceDesc, serviceDesc.Methods().ByName(protoreflect.Name(methodName))
 }
 
 // MethodBoolOption reads a bool extension from the method's options.
