@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/jesse0michael/pkg/auth"
+	_ "github.com/jesse0michael/pkg/grpc/proto/test"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -13,10 +14,11 @@ import (
 
 func TestAdminUnaryServerInterceptor(t *testing.T) {
 	tests := []struct {
-		name     string
-		ctx      context.Context
-		wantErr  bool
-		wantCode codes.Code
+		name       string
+		ctx        context.Context
+		fullMethod string
+		wantErr    bool
+		wantCode   codes.Code
 	}{
 		{
 			name: "admin claim allowed",
@@ -34,6 +36,11 @@ func TestAdminUnaryServerInterceptor(t *testing.T) {
 			wantErr:  true,
 			wantCode: codes.PermissionDenied,
 		},
+		{
+			name:       "no_auth method skips admin check",
+			ctx:        t.Context(),
+			fullMethod: "/testproto.TestService/Public",
+		},
 	}
 
 	for _, tt := range tests {
@@ -44,7 +51,7 @@ func TestAdminUnaryServerInterceptor(t *testing.T) {
 				return "ok", nil
 			}
 
-			got, err := interceptor(tt.ctx, nil, &grpc.UnaryServerInfo{}, handler)
+			got, err := interceptor(tt.ctx, nil, &grpc.UnaryServerInfo{FullMethod: tt.fullMethod}, handler)
 			if tt.wantErr {
 				require.Error(t, err)
 				require.Equal(t, tt.wantCode, status.Code(err))
@@ -59,10 +66,11 @@ func TestAdminUnaryServerInterceptor(t *testing.T) {
 
 func TestAdminStreamServerInterceptor(t *testing.T) {
 	tests := []struct {
-		name     string
-		ctx      context.Context
-		wantErr  bool
-		wantCode codes.Code
+		name       string
+		ctx        context.Context
+		fullMethod string
+		wantErr    bool
+		wantCode   codes.Code
 	}{
 		{
 			name: "admin claim allowed",
@@ -80,6 +88,11 @@ func TestAdminStreamServerInterceptor(t *testing.T) {
 			wantErr:  true,
 			wantCode: codes.PermissionDenied,
 		},
+		{
+			name:       "no_auth method skips admin check",
+			ctx:        t.Context(),
+			fullMethod: "/testproto.TestService/Public",
+		},
 	}
 
 	for _, tt := range tests {
@@ -91,7 +104,7 @@ func TestAdminStreamServerInterceptor(t *testing.T) {
 				return nil
 			}
 
-			err := interceptor(nil, ss, &grpc.StreamServerInfo{}, handler)
+			err := interceptor(nil, ss, &grpc.StreamServerInfo{FullMethod: tt.fullMethod}, handler)
 			if tt.wantErr {
 				require.Error(t, err)
 				require.Equal(t, tt.wantCode, status.Code(err))

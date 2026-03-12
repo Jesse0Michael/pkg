@@ -11,7 +11,10 @@ import (
 // requires the caller to have Admin claims. It expects the auth interceptor
 // to have already populated the context with claims.
 func AdminUnaryServerInterceptor() grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req any, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+		if HasNoAuth(info.FullMethod) {
+			return handler(ctx, req)
+		}
 		if admin, _ := auth.Admin(ctx); !admin {
 			return nil, ErrPermissionDenied
 		}
@@ -23,7 +26,10 @@ func AdminUnaryServerInterceptor() grpc.UnaryServerInterceptor {
 // requires the caller to have Admin claims. It expects the auth interceptor
 // to have already populated the context with claims.
 func AdminStreamServerInterceptor() grpc.StreamServerInterceptor {
-	return func(srv any, ss grpc.ServerStream, _ *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	return func(srv any, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+		if HasNoAuth(info.FullMethod) {
+			return handler(srv, ss)
+		}
 		if admin, _ := auth.Admin(ss.Context()); !admin {
 			return ErrPermissionDenied
 		}
