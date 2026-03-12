@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.4.0](https://github.com/Jesse0Michael/pkg/compare/grpc/v1.3.2...grpc/v1.4.0) (2026-03-12)
+
+
+### Features
+
+* add admin auth interceptor ([fb410a6](https://github.com/Jesse0Michael/pkg/commit/fb410a6d5927e4936cb3efadcbf0776c3088aba8))
+
+
+### Bug Fixes
+
+* allow no_auth ([8160307](https://github.com/Jesse0Michael/pkg/commit/8160307026a0ec698dac633bb8032c8f0f8cb6a9))
+* exempt gRPC system services (health, reflection) from auth ([adc14c4](https://github.com/Jesse0Michael/pkg/commit/adc14c4b18c674d8757ce5aef640dafe31c56b27))
+
 ## [1.3.2](https://github.com/Jesse0Michael/pkg/compare/grpc/v1.3.1...grpc/v1.3.2) (2026-03-05)
 
 
