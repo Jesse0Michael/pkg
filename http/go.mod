@@ -1,6 +1,6 @@
 module github.com/jesse0michael/pkg/http
 
-go 1.26.0
+go 1.26.2
 
 require (
 	github.com/go-playground/validator/v10 v10.30.2

@@ -1,6 +1,6 @@
 module github.com/jesse0michael/pkg/grpc
 
-go 1.26.0
+go 1.26.2
 
 require (
 	github.com/jesse0michael/pkg/auth v0.4.3

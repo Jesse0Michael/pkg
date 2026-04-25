@@ -1,6 +1,6 @@
 module github.com/jesse0michael/pkg/config
 
-go 1.26.0
+go 1.26.2
 
 require (
 	cloud.google.com/go/firestore v1.22.0

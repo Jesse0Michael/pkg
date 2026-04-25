@@ -1,6 +1,6 @@
 module github.com/jesse0michael/pkg/boot
 
-go 1.26.0
+go 1.26.2
 
 require (
 	github.com/jesse0michael/pkg/config v0.6.0
