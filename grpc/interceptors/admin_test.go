@@ -6,7 +6,6 @@ import (
 
 	"github.com/jesse0michael/pkg/auth"
 	_ "github.com/jesse0michael/pkg/grpc/proto/test"
-	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -53,13 +52,21 @@ func TestAdminUnaryServerInterceptor(t *testing.T) {
 
 			got, err := interceptor(tt.ctx, nil, &grpc.UnaryServerInfo{FullMethod: tt.fullMethod}, handler)
 			if tt.wantErr {
-				require.Error(t, err)
-				require.Equal(t, tt.wantCode, status.Code(err))
+				if err == nil {
+					t.Fatal("expected error, got nil")
+				}
+				if code := status.Code(err); code != tt.wantCode {
+					t.Errorf("got code %v, want %v", code, tt.wantCode)
+				}
 				return
 			}
 
-			require.NoError(t, err)
-			require.Equal(t, "ok", got)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if got != "ok" {
+				t.Errorf("got %v, want ok", got)
+			}
 		})
 	}
 }
@@ -106,12 +113,18 @@ func TestAdminStreamServerInterceptor(t *testing.T) {
 
 			err := interceptor(nil, ss, &grpc.StreamServerInfo{FullMethod: tt.fullMethod}, handler)
 			if tt.wantErr {
-				require.Error(t, err)
-				require.Equal(t, tt.wantCode, status.Code(err))
+				if err == nil {
+					t.Fatal("expected error, got nil")
+				}
+				if code := status.Code(err); code != tt.wantCode {
+					t.Errorf("got code %v, want %v", code, tt.wantCode)
+				}
 				return
 			}
 
-			require.NoError(t, err)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
 		})
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"testing/synctest"
 
 	"github.com/jesse0michael/testhelpers/pkg/testserver"
 )
@@ -79,32 +80,37 @@ func TestHttpClient(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := HTTPClient()
-			req, _ := http.NewRequest("GET", tt.server.URL+"/test", nil)
-			resp, err := c.Do(req)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("HttpClient() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			// Run inside a synctest bubble so retry backoffs use the fake
+			// clock and complete instantly. The server is created outside the
+			// bubble, so its goroutines are unaffected.
+			synctest.Test(t, func(t *testing.T) {
+				c := HTTPClient()
+				req, _ := http.NewRequest("GET", tt.server.URL+"/test", nil)
+				resp, err := c.Do(req)
+				if (err != nil) != tt.wantErr {
+					t.Errorf("HttpClient() error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
 
-			var b []byte
-			if resp != nil {
-				b, _ = io.ReadAll(resp.Body)
-				_ = resp.Body.Close()
-			}
-			if !strings.Contains(string(b), tt.wantBody) {
-				t.Errorf("HttpClient() resp.Body = %v, wantBody %v", string(b), tt.wantBody)
-				return
-			}
+				var b []byte
+				if resp != nil {
+					b, _ = io.ReadAll(resp.Body)
+					_ = resp.Body.Close()
+				}
+				if !strings.Contains(string(b), tt.wantBody) {
+					t.Errorf("HttpClient() resp.Body = %v, wantBody %v", string(b), tt.wantBody)
+					return
+				}
 
-			var statusCode int
-			if resp != nil {
-				statusCode = resp.StatusCode
-			}
-			if statusCode != tt.wantStatus {
-				t.Errorf("HttpClient() resp.Status = %v, wantStatus %v", err, tt.wantStatus)
-				return
-			}
+				var statusCode int
+				if resp != nil {
+					statusCode = resp.StatusCode
+				}
+				if statusCode != tt.wantStatus {
+					t.Errorf("HttpClient() resp.Status = %v, wantStatus %v", err, tt.wantStatus)
+					return
+				}
+			})
 			tt.server.Close()
 		})
 	}

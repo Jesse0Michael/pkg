@@ -7,7 +7,6 @@ import (
 	"log/slog"
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 )
 
@@ -38,7 +37,9 @@ func TestLogUnaryServerInterceptor(t *testing.T) {
 
 			_, _ = interceptor(t.Context(), nil, info, handler)
 
-			require.Equal(t, tt.wantLog, buf.Len() > 0)
+			if got := buf.Len() > 0; got != tt.wantLog {
+				t.Errorf("got logged=%v, want %v", got, tt.wantLog)
+			}
 		})
 	}
 }
@@ -71,7 +72,9 @@ func TestLogStreamServerInterceptor(t *testing.T) {
 
 			_ = interceptor(nil, ss, info, handler)
 
-			require.Equal(t, tt.wantLog, buf.Len() > 0)
+			if got := buf.Len() > 0; got != tt.wantLog {
+				t.Errorf("got logged=%v, want %v", got, tt.wantLog)
+			}
 		})
 	}
 }

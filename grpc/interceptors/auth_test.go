@@ -8,7 +8,6 @@ import (
 	"github.com/jesse0michael/pkg/auth"
 	// Register the test proto so the global registry has services with options.
 	_ "github.com/jesse0michael/pkg/grpc/proto/test"
-	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -126,13 +125,21 @@ func TestAuthUnaryServerInterceptor(t *testing.T) {
 			info := &grpc.UnaryServerInfo{FullMethod: tt.fullMethod}
 			got, err := interceptor(ctx, nil, info, handler)
 			if tt.wantErr {
-				require.Error(t, err)
-				require.Equal(t, tt.wantCode, status.Code(err))
+				if err == nil {
+					t.Fatal("expected error, got nil")
+				}
+				if code := status.Code(err); code != tt.wantCode {
+					t.Errorf("got code %v, want %v", code, tt.wantCode)
+				}
 				return
 			}
 
-			require.NoError(t, err)
-			require.Equal(t, "ok", got)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if got != "ok" {
+				t.Errorf("got %v, want ok", got)
+			}
 		})
 	}
 }
@@ -209,12 +216,18 @@ func TestAuthStreamServerInterceptor(t *testing.T) {
 			info := &grpc.StreamServerInfo{FullMethod: tt.fullMethod}
 			err := interceptor(nil, ss, info, handler)
 			if tt.wantErr {
-				require.Error(t, err)
-				require.Equal(t, tt.wantCode, status.Code(err))
+				if err == nil {
+					t.Fatal("expected error, got nil")
+				}
+				if code := status.Code(err); code != tt.wantCode {
+					t.Errorf("got code %v, want %v", code, tt.wantCode)
+				}
 				return
 			}
 
-			require.NoError(t, err)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
 		})
 	}
 }
@@ -261,7 +274,9 @@ func TestHasNoAuth(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			require.Equal(t, tt.want, HasNoAuth(tt.fullMethod))
+			if got := HasNoAuth(tt.fullMethod); got != tt.want {
+				t.Errorf("HasNoAuth(%q) = %v, want %v", tt.fullMethod, got, tt.want)
+			}
 		})
 	}
 }
@@ -291,7 +306,9 @@ func TestHasAdminOnly(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			require.Equal(t, tt.want, HasAdminOnly(tt.fullMethod))
+			if got := HasAdminOnly(tt.fullMethod); got != tt.want {
+				t.Errorf("HasAdminOnly(%q) = %v, want %v", tt.fullMethod, got, tt.want)
+			}
 		})
 	}
 }
@@ -316,7 +333,9 @@ func TestHasRejectReadOnly(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			require.Equal(t, tt.want, HasRejectReadOnly(tt.fullMethod))
+			if got := HasRejectReadOnly(tt.fullMethod); got != tt.want {
+				t.Errorf("HasRejectReadOnly(%q) = %v, want %v", tt.fullMethod, got, tt.want)
+			}
 		})
 	}
 }

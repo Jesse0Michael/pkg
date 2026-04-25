@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/jesse0michael/pkg/auth"
-	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	grpcpeer "google.golang.org/grpc/peer"
 )
@@ -57,7 +56,9 @@ func TestRateLimiterUnaryServerInterceptor(t *testing.T) {
 				_, err = interceptor(tt.ctx, nil, info, handler)
 			}
 
-			require.Equal(t, tt.wantErr, err != nil)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("got err=%v, wantErr=%v", err, tt.wantErr)
+			}
 		})
 	}
 
@@ -69,14 +70,17 @@ func TestRateLimiterUnaryServerInterceptor(t *testing.T) {
 		info := &grpc.UnaryServerInfo{FullMethod: "/test.Service/Method"}
 
 		ctx1 := context.WithValue(t.Context(), auth.SubjectContextKey, "test-user-1")
-		_, err := interceptor(ctx1, nil, info, handler)
-		require.NoError(t, err)
-		_, err = interceptor(ctx1, nil, info, handler)
-		require.Error(t, err)
+		if _, err := interceptor(ctx1, nil, info, handler); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if _, err := interceptor(ctx1, nil, info, handler); err == nil {
+			t.Fatal("expected error on second request for test-user-1")
+		}
 
 		ctx2 := context.WithValue(t.Context(), auth.SubjectContextKey, "test-user-2")
-		_, err = interceptor(ctx2, nil, info, handler)
-		require.NoError(t, err)
+		if _, err := interceptor(ctx2, nil, info, handler); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 
 	// Verify independent peer limits: a second peer should still be allowed
@@ -89,16 +93,19 @@ func TestRateLimiterUnaryServerInterceptor(t *testing.T) {
 		peer1 := grpcpeer.NewContext(t.Context(), &grpcpeer.Peer{
 			Addr: &net.TCPAddr{IP: net.ParseIP("10.0.0.1"), Port: 1000},
 		})
-		_, err := interceptor(peer1, nil, info, handler)
-		require.NoError(t, err)
-		_, err = interceptor(peer1, nil, info, handler)
-		require.Error(t, err)
+		if _, err := interceptor(peer1, nil, info, handler); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if _, err := interceptor(peer1, nil, info, handler); err == nil {
+			t.Fatal("expected error on second request for peer1")
+		}
 
 		peer2 := grpcpeer.NewContext(t.Context(), &grpcpeer.Peer{
 			Addr: &net.TCPAddr{IP: net.ParseIP("10.0.0.2"), Port: 2000},
 		})
-		_, err = interceptor(peer2, nil, info, handler)
-		require.NoError(t, err)
+		if _, err := interceptor(peer2, nil, info, handler); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 }
 
@@ -142,7 +149,9 @@ func TestRateLimiterStreamServerInterceptor(t *testing.T) {
 				err = interceptor(nil, ss, info, handler)
 			}
 
-			require.Equal(t, tt.wantErr, err != nil)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("got err=%v, wantErr=%v", err, tt.wantErr)
+			}
 		})
 	}
 }
