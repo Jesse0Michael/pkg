@@ -45,6 +45,12 @@
       "package-name": "github.com/jesse0michael/pkg/logger",
       "component": "logger"
     },
+    "data": {
+      "release-type": "go",
+      "path": "data",
+      "package-name": "github.com/jesse0michael/pkg/data",
+      "component": "data"
+    },
     "test": {
       "release-type": "go",
       "path": "test",

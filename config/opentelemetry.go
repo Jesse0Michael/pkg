@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/jesse0michael/pkg/logger"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/contrib/instrumentation/host"
 	"go.opentelemetry.io/contrib/instrumentation/runtime"
+	"go.opentelemetry.io/contrib/processors/baggagecopy"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
@@ -94,6 +96,7 @@ func OtelTraceProvider(ctx context.Context, cfg OpenTelemetryConfig, r *resource
 	tp := trace.NewTracerProvider(
 		trace.WithSampler(trace.ParentBased(trace.TraceIDRatioBased(cfg.OpenTelemetrySampleRate))),
 		trace.WithResource(r),
+		trace.WithSpanProcessor(baggagecopy.NewSpanProcessor(baggagecopy.AllowAllMembers)),
 		trace.WithSpanProcessor(trace.NewBatchSpanProcessor(traceExporter)),
 	)
 	otel.SetTracerProvider(tp)
@@ -145,9 +148,11 @@ func OtelLogProvider(ctx context.Context, cfg OpenTelemetryConfig, r *resource.R
 	)
 
 	slog.SetDefault(slog.New(
-		slog.NewMultiHandler(
-			slog.Default().Handler(),
-			handler,
+		logger.NewBaggageHandler(
+			slog.NewMultiHandler(
+				slog.Default().Handler(),
+				handler,
+			),
 		),
 	))
 

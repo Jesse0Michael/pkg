@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Go monorepo of reusable packages using Go workspaces (`go.work`). Each package has its own `go.mod` and is independently versioned via release-please.
 
-Packages: `auth`, `boot`, `cache`, `config`, `grpc`, `http`, `logger`, `test`
+Packages: `auth`, `boot`, `cache`, `config`, `data`, `grpc`, `http`, `logger`, `test`
 
 ## Commands
 
