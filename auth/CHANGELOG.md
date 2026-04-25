@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/auth` will be documented in this file by Release Please.
 
+## [0.5.0](https://github.com/Jesse0Michael/pkg/compare/auth/v0.4.3...auth/v0.5.0) (2026-04-25)
+
+
+### Features
+
+* add data package ([0d25b8a](https://github.com/Jesse0Michael/pkg/commit/0d25b8af0ecc3403ad3d50f132ba1360b2acce0c))
+
 ## [0.4.3](https://github.com/Jesse0Michael/pkg/compare/auth/v0.4.2...auth/v0.4.3) (2026-03-05)
 
 

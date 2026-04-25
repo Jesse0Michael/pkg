@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/boot` will be documented in this file by Release Please.
 
+## [0.7.0](https://github.com/Jesse0Michael/pkg/compare/boot/v0.6.0...boot/v0.7.0) (2026-04-25)
+
+
+### Features
+
+* add data package ([0d25b8a](https://github.com/Jesse0Michael/pkg/commit/0d25b8af0ecc3403ad3d50f132ba1360b2acce0c))
+
 ## [0.6.0](https://github.com/Jesse0Michael/pkg/compare/boot/v0.5.1...boot/v0.6.0) (2026-02-24)
 
 
