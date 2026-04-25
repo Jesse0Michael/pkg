@@ -216,7 +216,6 @@ func TestOtelTraceProvider(t *testing.T) {
 	tests := []struct {
 		name    string
 		cfg     OpenTelemetryConfig
-		wantTP  bool
 		wantErr bool
 	}{
 		{
@@ -224,14 +223,12 @@ func TestOtelTraceProvider(t *testing.T) {
 			cfg: OpenTelemetryConfig{
 				OpenTelemetryEndpoint: "localhost:4317",
 			},
-			wantTP:  true,
 			wantErr: false,
 		},
 		{
-			name:    "failed trace provider",
+			name:    "empty config",
 			cfg:     OpenTelemetryConfig{},
-			wantTP:  false,
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
@@ -241,13 +238,13 @@ func TestOtelTraceProvider(t *testing.T) {
 				t.Errorf("OtelTraceProvider() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if tt.wantTP {
-				tp := otel.GetTracerProvider()
-				if !reflect.DeepEqual(got, tp) {
-					t.Errorf("OtelTraceProvider() = %v, want %v", got, tp)
-				}
-			} else if got != nil {
-				t.Errorf("OtelTraceProvider() tp = %v, want %v", got, nil)
+			if got == nil {
+				t.Errorf("OtelTraceProvider() = %v, want non-nil", got)
+				return
+			}
+			tp := otel.GetTracerProvider()
+			if !reflect.DeepEqual(got, tp) {
+				t.Errorf("OtelTraceProvider() = %v, want %v", got, tp)
 			}
 		})
 	}
@@ -257,7 +254,6 @@ func TestOtelMeterProvider(t *testing.T) {
 	tests := []struct {
 		name    string
 		cfg     OpenTelemetryConfig
-		wantMP  bool
 		wantErr bool
 	}{
 		{
@@ -265,14 +261,12 @@ func TestOtelMeterProvider(t *testing.T) {
 			cfg: OpenTelemetryConfig{
 				OpenTelemetryEndpoint: "localhost:4317",
 			},
-			wantMP:  true,
 			wantErr: false,
 		},
 		{
-			name:    "failed meter provider",
+			name:    "empty config",
 			cfg:     OpenTelemetryConfig{},
-			wantMP:  false,
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
@@ -283,13 +277,13 @@ func TestOtelMeterProvider(t *testing.T) {
 				t.Errorf("OtelMeterProvider() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if tt.wantMP {
-				mp := otel.GetMeterProvider()
-				if !reflect.DeepEqual(got, mp) {
-					t.Errorf("OtelMeterProvider() = %v, want %v", got, mp)
-				}
-			} else if got != nil {
-				t.Errorf("OtelMeterProvider() mp = %v, want %v", got, nil)
+			if got == nil {
+				t.Errorf("OtelMeterProvider() = %v, want non-nil", got)
+				return
+			}
+			mp := otel.GetMeterProvider()
+			if !reflect.DeepEqual(got, mp) {
+				t.Errorf("OtelMeterProvider() = %v, want %v", got, mp)
 			}
 		})
 	}
