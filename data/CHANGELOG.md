@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/Jesse0Michael/pkg/compare/data/v1.0.0...data/v1.1.0) (2026-04-25)
+
+
+### Features
+
+* add Dict ([56bb781](https://github.com/Jesse0Michael/pkg/commit/56bb7817ec91818c98046b6f45833f2b624c2661))
+
 ## 1.0.0 (2026-04-25)
 
 
