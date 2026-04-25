@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/test` will be documented in this file by Release Please.
 
+## [0.3.1](https://github.com/Jesse0Michael/pkg/compare/test/v0.3.0...test/v0.3.1) (2026-04-25)
+
+
+### Bug Fixes
+
+* go version 1.26.2 ([0416552](https://github.com/Jesse0Michael/pkg/commit/0416552a892ba310ac2ff1b3809f40aabd4caa3b))
+
 ## [0.3.0](https://github.com/Jesse0Michael/pkg/compare/test/v0.2.0...test/v0.3.0) (2026-02-17)
 
 
