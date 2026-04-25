@@ -7,7 +7,6 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/require"
 )
 
 func TestNewAuthService(t *testing.T) {
@@ -20,11 +19,21 @@ func TestNewAuthService(t *testing.T) {
 
 	svc := NewJWTAuth(cfg, jwt.SigningMethodHS256)
 
-	require.NotNil(t, svc, "service should not be nil")
-	require.Equal(t, cfg.SecretKey, svc.cfg.SecretKey, "secret key should match")
-	require.Equal(t, cfg.Issuer, svc.cfg.Issuer, "issuer should match")
-	require.Equal(t, cfg.AccessTokenTTL, svc.cfg.AccessTokenTTL, "access token TTL should match")
-	require.Equal(t, cfg.RefreshTokenTTL, svc.cfg.RefreshTokenTTL, "refresh token TTL should match")
+	if svc == nil {
+		t.Fatal("service should not be nil")
+	}
+	if string(svc.cfg.SecretKey) != string(cfg.SecretKey) {
+		t.Errorf("secret key = %q, want %q", svc.cfg.SecretKey, cfg.SecretKey)
+	}
+	if svc.cfg.Issuer != cfg.Issuer {
+		t.Errorf("issuer = %q, want %q", svc.cfg.Issuer, cfg.Issuer)
+	}
+	if svc.cfg.AccessTokenTTL != cfg.AccessTokenTTL {
+		t.Errorf("access token TTL = %v, want %v", svc.cfg.AccessTokenTTL, cfg.AccessTokenTTL)
+	}
+	if svc.cfg.RefreshTokenTTL != cfg.RefreshTokenTTL {
+		t.Errorf("refresh token TTL = %v, want %v", svc.cfg.RefreshTokenTTL, cfg.RefreshTokenTTL)
+	}
 }
 
 func TestGenerateTokens(t *testing.T) {
@@ -74,15 +83,23 @@ func TestGenerateTokens(t *testing.T) {
 			svc := NewJWTAuth(cfg, jwt.SigningMethodHS256)
 			accessToken, refreshToken, err := svc.GenerateTokens(tt.options...)
 
-			require.NoError(t, err)
-			require.NotEmpty(t, accessToken)
-			require.NotEmpty(t, refreshToken)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if accessToken == "" {
+				t.Fatal("access token should not be empty")
+			}
+			if refreshToken == "" {
+				t.Fatal("refresh token should not be empty")
+			}
 
 			// Validate token structure (should be 3 parts separated by dots)
-			accessParts := strings.Split(accessToken, ".")
-			require.Equal(t, 3, len(accessParts))
-			refreshParts := strings.Split(refreshToken, ".")
-			require.Equal(t, 3, len(refreshParts))
+			if parts := strings.Split(accessToken, "."); len(parts) != 3 {
+				t.Errorf("access token parts = %d, want 3", len(parts))
+			}
+			if parts := strings.Split(refreshToken, "."); len(parts) != 3 {
+				t.Errorf("refresh token parts = %d, want 3", len(parts))
+			}
 		})
 	}
 }
@@ -100,7 +117,9 @@ func TestVerifyAccessToken(t *testing.T) {
 
 	svc := NewJWTAuth(cfg, jwt.SigningMethodHS256)
 	accessToken, _, err := svc.GenerateTokens(WithSubject(userID))
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("GenerateTokens: %v", err)
+	}
 
 	tests := []struct {
 		name      string
@@ -139,15 +158,21 @@ func TestVerifyAccessToken(t *testing.T) {
 			claims, err := svc.VerifyToken(tt.token, AccessTokenType)
 
 			if tt.wantErr {
-				require.Error(t, err)
+				if err == nil {
+					t.Fatal("expected error, got nil")
+				}
 				return
 			}
 
-			require.NoError(t, err)
-			require.NotNil(t, claims)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if claims == nil {
+				t.Fatal("claims should not be nil")
+			}
 
-			if tt.checkUser {
-				require.Equal(t, userID, claims.Subject)
+			if tt.checkUser && claims.Subject != userID {
+				t.Errorf("subject = %q, want %q", claims.Subject, userID)
 			}
 		})
 	}
@@ -166,7 +191,9 @@ func TestVerifyRefreshToken(t *testing.T) {
 
 	svc := NewJWTAuth(cfg, jwt.SigningMethodHS256)
 	_, refreshToken, err := svc.GenerateTokens(WithSubject(userID))
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("GenerateTokens: %v", err)
+	}
 
 	tests := []struct {
 		name      string
@@ -205,15 +232,21 @@ func TestVerifyRefreshToken(t *testing.T) {
 			claims, err := svc.VerifyToken(tt.token, RefreshTokenType)
 
 			if tt.wantErr {
-				require.Error(t, err)
+				if err == nil {
+					t.Fatal("expected error, got nil")
+				}
 				return
 			}
 
-			require.NoError(t, err)
-			require.NotNil(t, claims)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if claims == nil {
+				t.Fatal("claims should not be nil")
+			}
 
-			if tt.checkUser {
-				require.Equal(t, userID, claims.Subject)
+			if tt.checkUser && claims.Subject != userID {
+				t.Errorf("subject = %q, want %q", claims.Subject, userID)
 			}
 		})
 	}
@@ -232,7 +265,9 @@ func TestRefreshTokens(t *testing.T) {
 
 	svc := NewJWTAuth(cfg, jwt.SigningMethodHS256)
 	_, refreshToken, err := svc.GenerateTokens(WithSubject(userID))
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("GenerateTokens: %v", err)
+	}
 
 	tests := []struct {
 		name            string
@@ -265,24 +300,41 @@ func TestRefreshTokens(t *testing.T) {
 			newAccessToken, newRefreshToken, err := svc.RefreshTokens(tt.refreshToken)
 
 			if tt.wantErr {
-				require.Error(t, err)
+				if err == nil {
+					t.Fatal("expected error, got nil")
+				}
 				return
 			}
 
-			require.NoError(t, err)
-			require.NotEmpty(t, newAccessToken)
-			require.NotEmpty(t, newRefreshToken)
-			require.NotEqual(t, refreshToken, newRefreshToken, "refresh token should be different")
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if newAccessToken == "" {
+				t.Fatal("new access token should not be empty")
+			}
+			if newRefreshToken == "" {
+				t.Fatal("new refresh token should not be empty")
+			}
+			if newRefreshToken == refreshToken {
+				t.Error("refresh token should be different")
+			}
 
 			if tt.verifyNewTokens {
-				// Verify that the new tokens work
 				accessClaims, err := svc.VerifyToken(newAccessToken, AccessTokenType)
-				require.NoError(t, err)
-				require.Equal(t, userID, accessClaims.Subject)
+				if err != nil {
+					t.Fatalf("VerifyToken access: %v", err)
+				}
+				if accessClaims.Subject != userID {
+					t.Errorf("access subject = %q, want %q", accessClaims.Subject, userID)
+				}
 
 				refreshClaims, err := svc.VerifyToken(newRefreshToken, RefreshTokenType)
-				require.NoError(t, err)
-				require.Equal(t, userID, refreshClaims.Subject)
+				if err != nil {
+					t.Fatalf("VerifyToken refresh: %v", err)
+				}
+				if refreshClaims.Subject != userID {
+					t.Errorf("refresh subject = %q, want %q", refreshClaims.Subject, userID)
+				}
 			}
 		})
 	}
@@ -291,25 +343,29 @@ func TestRefreshTokens(t *testing.T) {
 func TestExpiredToken(t *testing.T) {
 	userID := uuid.NewString()
 
-	// Create a config with very short TTL to test expiration
+	// Very short TTL so the token expires within the test.
 	cfg := Config{
 		SecretKey:       []byte("test-secret"),
 		Issuer:          "test-issuer",
-		AccessTokenTTL:  time.Millisecond * 10, // Very short expiry
+		AccessTokenTTL:  time.Millisecond * 10,
 		RefreshTokenTTL: time.Hour * 24,
 	}
 
 	svc := NewJWTAuth(cfg, jwt.SigningMethodHS256)
 	accessToken, _, err := svc.GenerateTokens(WithSubject(userID))
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("GenerateTokens: %v", err)
+	}
 
-	// Wait for token to expire
 	time.Sleep(time.Millisecond * 15)
 
-	// Try to verify the expired token
 	_, err = svc.VerifyToken(accessToken, AccessTokenType)
-	require.Error(t, err)
-	require.Contains(t, err.Error(), "expired")
+	if err == nil {
+		t.Fatal("expected error for expired token, got nil")
+	}
+	if !strings.Contains(err.Error(), "expired") {
+		t.Errorf("error = %q, want it to contain %q", err.Error(), "expired")
+	}
 }
 
 func TestTokenTypeValidation(t *testing.T) {
@@ -323,17 +379,25 @@ func TestTokenTypeValidation(t *testing.T) {
 
 	svc := NewJWTAuth(cfg, jwt.SigningMethodHS256)
 	accessToken, refreshToken, err := svc.GenerateTokens(WithSubject(userID))
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("GenerateTokens: %v", err)
+	}
 
-	// Try to use access token as refresh token
 	_, err = svc.VerifyToken(accessToken, RefreshTokenType)
-	require.Error(t, err)
-	require.Contains(t, err.Error(), "expected refresh token")
+	if err == nil {
+		t.Fatal("expected error verifying access token as refresh, got nil")
+	}
+	if !strings.Contains(err.Error(), "expected refresh token") {
+		t.Errorf("error = %q, want it to contain %q", err.Error(), "expected refresh token")
+	}
 
-	// Try to use refresh token as access token
 	_, err = svc.VerifyToken(refreshToken, AccessTokenType)
-	require.Error(t, err)
-	require.Contains(t, err.Error(), "expected access token")
+	if err == nil {
+		t.Fatal("expected error verifying refresh token as access, got nil")
+	}
+	if !strings.Contains(err.Error(), "expected access token") {
+		t.Errorf("error = %q, want it to contain %q", err.Error(), "expected access token")
+	}
 }
 
 func TestExtractUserIDFromToken(t *testing.T) {
@@ -347,7 +411,9 @@ func TestExtractUserIDFromToken(t *testing.T) {
 
 	svc := NewJWTAuth(cfg, jwt.SigningMethodHS256)
 	accessToken, refreshToken, err := svc.GenerateTokens(WithSubject(userID))
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("GenerateTokens: %v", err)
+	}
 
 	tests := []struct {
 		name    string
@@ -383,11 +449,10 @@ func TestExtractUserIDFromToken(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Extract the user ID directly by verifying token and getting subject
 			var subject string
 			var err error
 
-			// Try as access token first, then as refresh token
+			// Try as access token first, then as refresh token.
 			if claims, verifyErr := svc.VerifyToken(tt.token, AccessTokenType); verifyErr == nil {
 				subject = claims.Subject
 			} else if claims, verifyErr := svc.VerifyToken(tt.token, RefreshTokenType); verifyErr == nil {
@@ -397,11 +462,17 @@ func TestExtractUserIDFromToken(t *testing.T) {
 			}
 
 			if tt.wantErr {
-				require.Error(t, err)
+				if err == nil {
+					t.Fatal("expected error, got nil")
+				}
 				return
 			}
-			require.NoError(t, err)
-			require.Equal(t, tt.want, subject)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if subject != tt.want {
+				t.Errorf("subject = %q, want %q", subject, tt.want)
+			}
 		})
 	}
 }
@@ -417,20 +488,23 @@ func TestVerifyTokenWithInvalidSigningMethod(t *testing.T) {
 
 	svc := NewJWTAuth(cfg, jwt.SigningMethodHS256)
 	accessToken, _, err := svc.GenerateTokens(WithSubject(userID))
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("GenerateTokens: %v", err)
+	}
 
-	// This test simulates what would happen if the token verification encountered
-	// an unexpected signing method. We can't directly create such a token in test
-	// without access to the internal details, but we can verify that the error
-	// handling path exists by ensuring our tokens are correctly verified.
 	claims, err := svc.VerifyToken(accessToken, AccessTokenType)
-	require.NoError(t, err)
-	require.NotNil(t, claims)
-	require.Equal(t, AccessTokenType, claims.TokenType)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if claims == nil {
+		t.Fatal("claims should not be nil")
+	}
+	if claims.TokenType != AccessTokenType {
+		t.Errorf("token type = %q, want %q", claims.TokenType, AccessTokenType)
+	}
 }
 
 func TestWithInvalidConfig(t *testing.T) {
-	// Tests with various invalid configurations to ensure robustness
 	tests := []struct {
 		name       string
 		cfg        Config
@@ -444,7 +518,7 @@ func TestWithInvalidConfig(t *testing.T) {
 				AccessTokenTTL:  time.Minute * 15,
 				RefreshTokenTTL: time.Hour * 24,
 			},
-			shouldWork: false, // Implementation dependent - might still work with empty secret
+			shouldWork: false,
 		},
 		{
 			name: "empty issuer",
@@ -454,7 +528,7 @@ func TestWithInvalidConfig(t *testing.T) {
 				AccessTokenTTL:  time.Minute * 15,
 				RefreshTokenTTL: time.Hour * 24,
 			},
-			shouldWork: true, // Should work with empty issuer
+			shouldWork: true,
 		},
 		{
 			name: "zero TTLs",
@@ -464,7 +538,7 @@ func TestWithInvalidConfig(t *testing.T) {
 				AccessTokenTTL:  0,
 				RefreshTokenTTL: 0,
 			},
-			shouldWork: false, // Zero TTL might cause immediate expiration
+			shouldWork: false,
 		},
 	}
 
@@ -476,33 +550,41 @@ func TestWithInvalidConfig(t *testing.T) {
 
 			if !tt.shouldWork {
 				if err == nil {
-					// If no error on generation, tokens should at least be verifiable
-					_, err = svc.VerifyToken(accessToken, AccessTokenType)
-					if err != nil {
-						// This is expected for some invalid configs
+					if _, err = svc.VerifyToken(accessToken, AccessTokenType); err != nil {
 						return
 					}
-					_, err = svc.VerifyToken(refreshToken, RefreshTokenType)
-					if err != nil {
-						// This is expected for some invalid configs
+					if _, err = svc.VerifyToken(refreshToken, RefreshTokenType); err != nil {
 						return
 					}
 				}
 				return
 			}
 
-			require.NoError(t, err)
-			require.NotEmpty(t, accessToken)
-			require.NotEmpty(t, refreshToken)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if accessToken == "" {
+				t.Fatal("access token should not be empty")
+			}
+			if refreshToken == "" {
+				t.Fatal("refresh token should not be empty")
+			}
 
-			// Verify tokens
 			accessClaims, err := svc.VerifyToken(accessToken, AccessTokenType)
-			require.NoError(t, err)
-			require.Equal(t, userID, accessClaims.Subject)
+			if err != nil {
+				t.Fatalf("VerifyToken access: %v", err)
+			}
+			if accessClaims.Subject != userID {
+				t.Errorf("access subject = %q, want %q", accessClaims.Subject, userID)
+			}
 
 			refreshClaims, err := svc.VerifyToken(refreshToken, RefreshTokenType)
-			require.NoError(t, err)
-			require.Equal(t, userID, refreshClaims.Subject)
+			if err != nil {
+				t.Fatalf("VerifyToken refresh: %v", err)
+			}
+			if refreshClaims.Subject != userID {
+				t.Errorf("refresh subject = %q, want %q", refreshClaims.Subject, userID)
+			}
 		})
 	}
 }
@@ -533,20 +615,36 @@ func TestWithClaims(t *testing.T) {
 			ctx := WithClaims(t.Context(), tt.claim)
 
 			subject, subjectOK := Subject(ctx)
-			require.Equal(t, tt.claim.Subject, subject)
-			require.Equal(t, tt.claim.Subject != "", subjectOK)
+			if subject != tt.claim.Subject {
+				t.Errorf("subject = %q, want %q", subject, tt.claim.Subject)
+			}
+			if subjectOK != (tt.claim.Subject != "") {
+				t.Errorf("subjectOK = %v, want %v", subjectOK, tt.claim.Subject != "")
+			}
 
 			admin, adminOK := Admin(ctx)
-			require.Equal(t, tt.claim.Admin, admin)
-			require.Equal(t, tt.claim.Admin, adminOK)
+			if admin != tt.claim.Admin {
+				t.Errorf("admin = %v, want %v", admin, tt.claim.Admin)
+			}
+			if adminOK != tt.claim.Admin {
+				t.Errorf("adminOK = %v, want %v", adminOK, tt.claim.Admin)
+			}
 
 			readOnly, readOnlyOK := ReadOnly(ctx)
-			require.Equal(t, tt.claim.ReadOnly, readOnly)
-			require.Equal(t, tt.claim.ReadOnly, readOnlyOK)
+			if readOnly != tt.claim.ReadOnly {
+				t.Errorf("readOnly = %v, want %v", readOnly, tt.claim.ReadOnly)
+			}
+			if readOnlyOK != tt.claim.ReadOnly {
+				t.Errorf("readOnlyOK = %v, want %v", readOnlyOK, tt.claim.ReadOnly)
+			}
 
 			jti, jtiOK := JTI(ctx)
-			require.Equal(t, tt.claim.ID, jti)
-			require.Equal(t, tt.claim.ID != "", jtiOK)
+			if jti != tt.claim.ID {
+				t.Errorf("jti = %q, want %q", jti, tt.claim.ID)
+			}
+			if jtiOK != (tt.claim.ID != "") {
+				t.Errorf("jtiOK = %v, want %v", jtiOK, tt.claim.ID != "")
+			}
 		})
 	}
 }

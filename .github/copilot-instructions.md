@@ -42,7 +42,7 @@ slog.ErrorContext(ctx, "failed to create client", "err", err)
 
 ### Testing
 
-Use table-driven tests with testify/require for assertions,
+Use table-driven tests,
 Use `t.Context()` for passing context in tests,
 Use `gomock` with a mockSetup test case function for mocking dependencies in tests:
 For hardcoded identifiers use the format `test-{name type}` ex: `test-user`, `test-error`

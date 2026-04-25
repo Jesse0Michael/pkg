@@ -31,7 +31,7 @@ make vuln       # Run govulncheck across all modules
 
 ## Testing Conventions
 
-- **Table-driven tests** with `testify/require` for assertions
+- **Table-driven tests** 
 - Use `t.Context()` for context in tests
 - Use `gomock` with a `mockSetup` test case function for mocking
 - Test identifiers: `test-{type}` or `test-{type}-{index}` (e.g., `test-user`, `test-user-1`)

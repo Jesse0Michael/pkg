@@ -80,12 +80,14 @@ func TestHttpClient(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Run inside a synctest bubble so retry backoffs use the fake
-			// clock and complete instantly. The server is created outside the
-			// bubble, so its goroutines are unaffected.
+			// Run in a synctest bubble so the retry backoffs use the bubble's
+			// fake clock and complete instantly. req.Close disables keep-alive
+			// so the transport's persistConn goroutines exit between retries
+			// and don't keep the bubble blocked on real I/O.
 			synctest.Test(t, func(t *testing.T) {
 				c := HTTPClient()
 				req, _ := http.NewRequest("GET", tt.server.URL+"/test", nil)
+				req.Close = true
 				resp, err := c.Do(req)
 				if (err != nil) != tt.wantErr {
 					t.Errorf("HttpClient() error = %v, wantErr %v", err, tt.wantErr)
