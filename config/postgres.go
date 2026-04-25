@@ -49,7 +49,7 @@ func NewPostgresClient(cfg PostgresConfig) (*sqlx.DB, error) {
 	db.SetMaxOpenConns(cfg.MaxConns)
 	db.SetConnMaxLifetime(cfg.MaxConnDuration)
 
-	if err := otelsql.RegisterDBStatsMetrics(db.DB, otelsql.WithAttributes(semconv.DBSystemPostgreSQL)); err != nil {
+	if _, err := otelsql.RegisterDBStatsMetrics(db.DB, otelsql.WithAttributes(semconv.DBSystemPostgreSQL)); err != nil {
 		return nil, err
 	}
 
