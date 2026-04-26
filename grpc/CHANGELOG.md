@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/Jesse0Michael/pkg/compare/grpc/v1.5.0...grpc/v1.6.0) (2026-04-26)
+
+
+### Features
+
+* revoked token checker ([96158a3](https://github.com/Jesse0Michael/pkg/commit/96158a38fbfd8aad446d2104c109ca8cadef07d2))
+
 ## [1.5.0](https://github.com/Jesse0Michael/pkg/compare/grpc/v1.4.0...grpc/v1.5.0) (2026-04-25)
 
 
