@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/auth` will be documented in this file by Release Please.
 
+## [0.6.0](https://github.com/Jesse0Michael/pkg/compare/auth/v0.5.0...auth/v0.6.0) (2026-04-26)
+
+
+### Features
+
+* revoked token checker ([96158a3](https://github.com/Jesse0Michael/pkg/commit/96158a38fbfd8aad446d2104c109ca8cadef07d2))
+
 ## [0.5.0](https://github.com/Jesse0Michael/pkg/compare/auth/v0.4.3...auth/v0.5.0) (2026-04-25)
 
 
