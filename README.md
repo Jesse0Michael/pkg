@@ -8,6 +8,7 @@ A collection of common Go modules that cover the building blocks of Go services.
 | [Boot](./boot) | Application bootstrap helpers that coordinate configuration, logging, telemetry, and runner lifecycles. |
 | [Cache](./cache) | Caching primitives that pair Redis with local safeguards and cache-control awareness. |
 | [Config](./config) | Environment processing helpers and shared configuration structs for common infrastructure. |
+| [Data](./data) | Generic, concurrency-safe data structures and OpenTelemetry baggage helpers. |
 | [GRPC](./grpc) | Foundations for consistent gRPC services—middleware, handlers, clients, and error helpers. |
 | [HTTP](./http) | Foundations for consistent HTTP services—middleware, handlers, parsers, clients, and error helpers. |
 | [Logger](./logger) | Opinionated `slog` setup that standardizes structured logging across services. |
