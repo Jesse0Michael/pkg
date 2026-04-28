@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/http` will be documented in this file by Release Please.
 
+## [0.7.1](https://github.com/Jesse0Michael/pkg/compare/http/v0.7.0...http/v0.7.1) (2026-04-28)
+
+
+### Bug Fixes
+
+* update healthchecker ([0c9e793](https://github.com/Jesse0Michael/pkg/commit/0c9e793864d9d405de58029f20f5fe19696491b5))
+
 ## [0.7.0](https://github.com/Jesse0Michael/pkg/compare/http/v0.6.0...http/v0.7.0) (2026-04-26)
 
 
