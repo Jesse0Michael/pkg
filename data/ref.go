@@ -38,16 +38,28 @@ func WithOnChange[T any](f func(T)) RefOption[T] {
 	}
 }
 
+// WithLazy disables the background ticker. Instead, Load() checks whether the
+// cached value is stale (older than the configured interval) and triggers an
+// async refresh, returning the current value immediately.
+func WithLazy[T any]() RefOption[T] {
+	return func(r *Ref[T]) {
+		r.lazy = true
+	}
+}
+
 // Ref holds a value of type T that is periodically refreshed by calling a function.
 // It is safe for concurrent reads.
 type Ref[T any] struct {
-	mu       sync.RWMutex
-	value    T
-	interval time.Duration
-	fetch    func(context.Context) (T, error)
-	onError  func(error)
-	onChange func(T)
-	cancel   context.CancelFunc
+	mu          sync.RWMutex
+	value       T
+	interval    time.Duration
+	fetch       func(context.Context) (T, error)
+	onError     func(error)
+	onChange    func(T)
+	cancel      context.CancelFunc
+	lazy        bool
+	lastRefresh time.Time
+	ctx         context.Context
 }
 
 // NewRef creates a Ref that refreshes its value by calling fetch at a regular interval (default 10s).
@@ -61,7 +73,10 @@ func NewRef[T any](ctx context.Context, fetch func(context.Context) (T, error), 
 		o(r)
 	}
 	ctx, r.cancel = context.WithCancel(ctx)
-	go r.start(ctx)
+	r.ctx = ctx
+	if !r.lazy {
+		go r.start(ctx)
+	}
 	return r
 }
 
@@ -86,22 +101,30 @@ func (r *Ref[T]) Stop() {
 	}
 }
 
-// Load returns the current value.
+// Load returns the current value. In lazy mode, if the cached value is stale
+// it triggers an async refresh and returns the current value immediately.
 func (r *Ref[T]) Load() T {
 	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.value
+	v := r.value
+	stale := r.lazy && time.Since(r.lastRefresh) > r.interval
+	r.mu.RUnlock()
+	if stale {
+		go r.refresh(r.ctx)
+	}
+	return v
 }
 
 func (r *Ref[T]) refresh(ctx context.Context) {
 	v, err := r.fetch(ctx)
+	r.mu.Lock()
+	r.lastRefresh = time.Now()
 	if err != nil {
+		r.mu.Unlock()
 		if r.onError != nil {
 			r.onError(err)
 		}
 		return
 	}
-	r.mu.Lock()
 	old := r.value
 	r.value = v
 	r.mu.Unlock()

@@ -142,3 +142,149 @@ func TestRef_Stop(t *testing.T) {
 		}
 	})
 }
+
+func TestRef_Lazy_NoFetchUntilLoad(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		var count atomic.Int32
+		_ = NewRef(t.Context(), func(ctx context.Context) (int, error) {
+			return int(count.Add(1)), nil
+		}, WithLazy[int](), WithInterval[int](10*time.Millisecond))
+
+		time.Sleep(25 * time.Millisecond)
+		synctest.Wait()
+
+		if got := count.Load(); got != 0 {
+			t.Errorf("fetch called %d times before Load(), want 0", got)
+		}
+	})
+}
+
+func TestRef_Lazy_RepeatedLoadWithinInterval(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		var count atomic.Int32
+		ref := NewRef(t.Context(), func(ctx context.Context) (int, error) {
+			return int(count.Add(1)), nil
+		}, WithLazy[int](), WithInterval[int](time.Hour))
+
+		// First Load triggers a fetch.
+		ref.Load()
+		synctest.Wait()
+
+		fetches := count.Load()
+
+		// Subsequent loads within the interval should not trigger another fetch.
+		ref.Load()
+		ref.Load()
+		synctest.Wait()
+
+		if got := count.Load(); got != fetches {
+			t.Errorf("fetch called %d times, want %d (no extra fetches within interval)", got, fetches)
+		}
+	})
+}
+
+func TestRef_Lazy_RefreshAfterInterval(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		var count atomic.Int32
+		ref := NewRef(t.Context(), func(ctx context.Context) (int, error) {
+			return int(count.Add(1)), nil
+		}, WithLazy[int](), WithInterval[int](10*time.Millisecond))
+
+		// First Load triggers initial fetch.
+		ref.Load()
+		synctest.Wait()
+
+		first := count.Load()
+		if first != 1 {
+			t.Fatalf("fetch called %d times after first Load, want 1", first)
+		}
+
+		// Wait for the value to become stale.
+		time.Sleep(15 * time.Millisecond)
+
+		ref.Load()
+		synctest.Wait()
+
+		if got := count.Load(); got != 2 {
+			t.Errorf("fetch called %d times, want 2 (one refresh after stale)", got)
+		}
+	})
+}
+
+func TestRef_Lazy_ConcurrentStaleLoad(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		var count atomic.Int32
+		ref := NewRef(t.Context(), func(ctx context.Context) (int, error) {
+			return int(count.Add(1)), nil
+		}, WithLazy[int](), WithInterval[int](10*time.Millisecond))
+
+		// Trigger initial fetch and let it complete.
+		ref.Load()
+		synctest.Wait()
+
+		// Wait for stale.
+		time.Sleep(15 * time.Millisecond)
+
+		before := count.Load()
+
+		// Multiple concurrent loads on a stale value.
+		for range 10 {
+			ref.Load()
+		}
+		synctest.Wait()
+
+		if got := count.Load(); got < before+1 {
+			t.Errorf("fetch called %d times after concurrent stale loads, want >= %d", got, before+1)
+		}
+	})
+}
+
+func TestRef_Lazy_OnChange(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		var count atomic.Int32
+		var changed atomic.Value
+		ref := NewRef(t.Context(), func(ctx context.Context) (int, error) {
+			return int(count.Add(1)), nil
+		},
+			WithLazy[int](),
+			WithInitialValue(0),
+			WithInterval[int](10*time.Millisecond),
+			WithOnChange[int](func(v int) {
+				changed.Store(v)
+			}),
+		)
+
+		ref.Load()
+		synctest.Wait()
+
+		if changed.Load() == nil {
+			t.Error("onChange was not called on lazy refresh")
+		}
+	})
+}
+
+func TestRef_Lazy_OnError(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		var gotErr atomic.Value
+		ref := NewRef(t.Context(), func(ctx context.Context) (string, error) {
+			return "", errors.New("test-error")
+		},
+			WithLazy[string](),
+			WithInitialValue("test-initial"),
+			WithInterval[string](10*time.Millisecond),
+			WithOnError[string](func(err error) {
+				gotErr.Store(err)
+			}),
+		)
+
+		ref.Load()
+		synctest.Wait()
+
+		if gotErr.Load() == nil {
+			t.Error("onError was not called on lazy refresh failure")
+		}
+		if got := ref.Load(); got != "test-initial" {
+			t.Errorf("Load() = %q, want %q (old value preserved on error)", got, "test-initial")
+		}
+	})
+}
