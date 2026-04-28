@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"net/http"
+	"net/http/pprof"
 	"slices"
 	"time"
 
@@ -27,10 +28,35 @@ func HandleNotAllowed() http.Handler {
 	})
 }
 
-// HandleHealth is a basic HTTP handler to use as a health check
-func HandleHealth() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+// HandlePprof returns a handler that serves runtime profiling data.
+func HandlePprof() http.Handler {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", pprof.Index)
+	mux.HandleFunc("/cmdline", pprof.Cmdline)
+	mux.HandleFunc("/profile", pprof.Profile)
+	mux.HandleFunc("/symbol", pprof.Symbol)
+	mux.HandleFunc("/trace", pprof.Trace)
+	return mux
+}
+
+// HealthChecker reports whether a dependency is healthy.
+type HealthChecker interface {
+	Healthy(ctx context.Context) error
+}
+
+// HandleHealth returns a health check handler. When called with no checkers it
+// always returns 200. When checkers are provided, each is called and any
+// failure results in a 503.
+func HandleHealth(checkers ...HealthChecker) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
+		for _, c := range checkers {
+			if err := c.Healthy(r.Context()); err != nil {
+				w.WriteHeader(http.StatusServiceUnavailable)
+				_, _ = w.Write([]byte(`{"message": "Health Unavailable"}`))
+				return
+			}
+		}
 		_, _ = w.Write([]byte(`{"message": "Health OK"}`))
 	})
 }
