@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/boot` will be documented in this file by Release Please.
 
+## [1.1.0](https://github.com/Jesse0Michael/pkg/compare/boot/v1.0.0...boot/v1.1.0) (2026-05-09)
+
+
+### Features
+
+* process config  by attributes, use boot options ([420ba96](https://github.com/Jesse0Michael/pkg/commit/420ba965c2357bad66f8063749f3f04a2c5691a3))
+
 ## [1.0.0](https://github.com/Jesse0Michael/pkg/compare/boot/v0.7.0...boot/v1.0.0) (2026-05-09)
 
 
