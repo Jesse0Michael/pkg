@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/config` will be documented in this file by Release Please.
 
+## [0.9.0](https://github.com/Jesse0Michael/pkg/compare/config/v0.8.0...config/v0.9.0) (2026-05-09)
+
+
+### Features
+
+* process config  by attributes, use boot options ([420ba96](https://github.com/Jesse0Michael/pkg/commit/420ba965c2357bad66f8063749f3f04a2c5691a3))
+
 ## [0.8.0](https://github.com/Jesse0Michael/pkg/compare/config/v0.7.0...config/v0.8.0) (2026-05-09)
 
 
