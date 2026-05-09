@@ -4,17 +4,24 @@ import (
 	"io"
 	"log/slog"
 	"os"
-	"strconv"
 	"strings"
 
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-// NewLogger sets and returns a new default logger.
-func NewLogger() *slog.Logger {
+// Config holds logger configuration with support for env vars, JSON, and YAML.
+type Config struct {
+	Level  string `envconfig:"LOG_LEVEL"  default:"INFO"  json:"level"  yaml:"level"`
+	Output string `envconfig:"LOG_OUTPUT" default:"STDOUT" json:"output" yaml:"output"`
+	Format string `envconfig:"LOG_FORMAT" default:"JSON"  json:"format" yaml:"format"`
+	Source *bool  `envconfig:"LOG_SOURCE" default:"true"  json:"source" yaml:"source"`
+}
+
+// NewLogger sets and returns a new default logger configured by the provided Config.
+func NewLogger(cfg Config) *slog.Logger {
 	handler := NewBaggageHandler(
 		NewOtelHandler(
-			LogFormat(),
+			cfg.LogFormat(),
 		),
 	)
 
@@ -32,10 +39,9 @@ func NewLogger() *slog.Logger {
 	return logger
 }
 
-// LogLevel returns the slog level from the LOG_LEVEL environment variable.
-// Defaults to INFO.
-func LogLevel() slog.Leveler {
-	switch strings.ToUpper(os.Getenv("LOG_LEVEL")) {
+// LogLevel returns the slog level from the config. Defaults to INFO.
+func (c Config) LogLevel() slog.Leveler {
+	switch strings.ToUpper(c.Level) {
 	case "DEBUG":
 		return slog.LevelDebug
 	case "WARN":
@@ -47,19 +53,18 @@ func LogLevel() slog.Leveler {
 	}
 }
 
-// LogOutput returns the slog output from the LOG_OUTPUT environment variable.
+// LogOutput returns the slog output writer from the config.
 // Supports "STDOUT", "STDERR", or a file path with automatic log rotation.
 // Defaults to os.Stdout.
-func LogOutput() io.Writer {
-	output := os.Getenv("LOG_OUTPUT")
-	switch strings.ToUpper(output) {
+func (c Config) LogOutput() io.Writer {
+	switch strings.ToUpper(c.Output) {
 	case "STDOUT", "":
 		return os.Stdout
 	case "STDERR":
 		return os.Stderr
 	default:
 		return &lumberjack.Logger{
-			Filename:   output,
+			Filename:   c.Output,
 			MaxSize:    100,
 			MaxBackups: 3,
 			MaxAge:     28,
@@ -68,29 +73,26 @@ func LogOutput() io.Writer {
 	}
 }
 
-// LogSource returns whether to include source information in logs from the LOG_SOURCE environment variable.
-// Defaults to true.
-func LogSource() bool {
-	value, err := strconv.ParseBool(os.Getenv("LOG_SOURCE"))
-	if err != nil {
+// LogSource returns whether to include source information in logs. Defaults to true.
+func (c Config) LogSource() bool {
+	if c.Source == nil {
 		return true
 	}
-	return value
+	return *c.Source
 }
 
-// LogFormat returns the slog handler to use based on the LOG_FORMAT environment variable.
-// Defaults to JSON Handler.
-func LogFormat() slog.Handler {
-	switch strings.ToUpper(os.Getenv("LOG_FORMAT")) {
+// LogFormat returns the slog handler based on the config format. Defaults to JSON.
+func (c Config) LogFormat() slog.Handler {
+	switch strings.ToUpper(c.Format) {
 	case "TEXT":
-		return slog.NewTextHandler(LogOutput(), &slog.HandlerOptions{
-			Level:     LogLevel(),
-			AddSource: LogSource(),
+		return slog.NewTextHandler(c.LogOutput(), &slog.HandlerOptions{
+			Level:     c.LogLevel(),
+			AddSource: c.LogSource(),
 		})
 	default:
-		return slog.NewJSONHandler(LogOutput(), &slog.HandlerOptions{
-			Level:     LogLevel(),
-			AddSource: LogSource(),
+		return slog.NewJSONHandler(c.LogOutput(), &slog.HandlerOptions{
+			Level:     c.LogLevel(),
+			AddSource: c.LogSource(),
 		})
 	}
 }

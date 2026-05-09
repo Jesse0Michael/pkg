@@ -21,13 +21,11 @@ func ExampleErrorWarnHandler() {
 	// Predefine environment
 	os.Setenv("ENVIRONMENT", "test")
 	os.Setenv("HOSTNAME", "local")
-	os.Setenv("LOG_OUTPUT", "stderr")
-	os.Setenv("LOG_SOURCE", "false")
 	ctx := context.Background()
 	warnCheck := func(err error) bool { return err != nil && err.Error() == "warn" }
 
 	// Example
-	NewLogger()
+	NewLogger(Config{Output: "STDERR", Source: new(false)})
 	SetErrorWarnHandler(warnCheck)
 
 	slog.ErrorContext(ctx, "writing errors", "error", errors.New("error"))

@@ -31,12 +31,10 @@ func ExampleNewLogger() {
 	// Predefine environment
 	os.Setenv("ENVIRONMENT", "test")
 	os.Setenv("HOSTNAME", "local")
-	os.Setenv("LOG_OUTPUT", "stderr")
-	os.Setenv("LOG_SOURCE", "false")
 	ctx := context.Background()
 
 	// Example
-	NewLogger()
+	NewLogger(Config{Output: "STDERR", Source: new(false)})
 
 	slog.With("key", "value").InfoContext(ctx, "writing logs")
 	slog.With("error", errors.New("error")).ErrorContext(ctx, "writing errors")
@@ -53,20 +51,22 @@ func TestNewLogger(t *testing.T) {
 	tests := []struct {
 		name  string
 		setup func()
+		cfg   Config
 		log   string
 	}{
 		{
 			name:  "set log",
 			setup: func() {},
+			cfg:   Config{},
 			log:   `{"level":"DEBUG","msg":"message"}`,
 		},
 		{
 			name: "set log with environment",
 			setup: func() {
-				t.Setenv("LOG_LEVEL", "debug")
 				t.Setenv("ENVIRONMENT", "test")
 				t.Setenv("HOSTNAME", "local")
 			},
+			cfg: Config{Level: "DEBUG"},
 			log: `{"level":"DEBUG","msg":"message","host":"local","env":"test"}`,
 		},
 	}
@@ -86,7 +86,7 @@ func TestNewLogger(t *testing.T) {
 
 			os.Clearenv()
 			tt.setup()
-			NewLogger()
+			NewLogger(tt.cfg)
 
 			_ = slog.Default().Handler().Handle(t.Context(), slog.NewRecord(time.Time{}, slog.LevelDebug, "message", 0))
 			_, _ = f.Seek(0, 0)
@@ -98,100 +98,83 @@ func TestNewLogger(t *testing.T) {
 	}
 }
 
-func Test_slogLevel(t *testing.T) {
+func TestConfig_LogLevel(t *testing.T) {
 	tests := []struct {
 		name  string
-		setup func()
+		cfg   Config
 		level slog.Leveler
 	}{
 		{
 			name:  "log level: empty",
-			setup: func() {},
+			cfg:   Config{},
 			level: slog.LevelInfo,
 		},
 		{
-			name: "log level: debug",
-			setup: func() {
-				t.Setenv("LOG_LEVEL", "debug")
-			},
+			name:  "log level: debug",
+			cfg:   Config{Level: "debug"},
 			level: slog.LevelDebug,
 		},
 		{
-			name: "log level: INFO",
-			setup: func() {
-				t.Setenv("LOG_LEVEL", "INFO")
-			},
+			name:  "log level: INFO",
+			cfg:   Config{Level: "INFO"},
 			level: slog.LevelInfo,
 		},
 		{
-			name: "log level: WARN",
-			setup: func() {
-				t.Setenv("LOG_LEVEL", "WARN")
-			},
+			name:  "log level: WARN",
+			cfg:   Config{Level: "WARN"},
 			level: slog.LevelWarn,
 		},
 		{
-			name: "log level: ErRoR",
-			setup: func() {
-				t.Setenv("LOG_LEVEL", "ErRoR")
-			},
+			name:  "log level: ErRoR",
+			cfg:   Config{Level: "ErRoR"},
 			level: slog.LevelError,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			os.Clearenv()
-			tt.setup()
-			if got := LogLevel(); !reflect.DeepEqual(got, tt.level) {
-				t.Errorf("slogLevel() = %v, want %v", got, tt.level)
+			if got := tt.cfg.LogLevel(); !reflect.DeepEqual(got, tt.level) {
+				t.Errorf("LogLevel() = %v, want %v", got, tt.level)
 			}
 		})
 	}
 }
 
-func Test_slogOut(t *testing.T) {
+func TestConfig_LogOutput(t *testing.T) {
 	tests := []struct {
 		name   string
-		setup  func()
+		cfg    Config
 		output io.Writer
 	}{
 		{
 			name:   "log output: empty",
-			setup:  func() {},
+			cfg:    Config{},
 			output: os.Stdout,
 		},
 		{
-			name: "log output: stderr",
-			setup: func() {
-				t.Setenv("LOG_OUTPUT", "stderr")
-			},
+			name:   "log output: stderr",
+			cfg:    Config{Output: "stderr"},
 			output: os.Stderr,
 		},
 		{
-			name: "log output: stdout",
-			setup: func() {
-				t.Setenv("LOG_OUTPUT", "STDOUT")
-			},
+			name:   "log output: stdout",
+			cfg:    Config{Output: "STDOUT"},
 			output: os.Stdout,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			os.Clearenv()
-			tt.setup()
-			if got := LogOutput(); !reflect.DeepEqual(got, tt.output) {
-				t.Errorf("slogOutput() = %v, want %v", got, tt.output)
+			if got := tt.cfg.LogOutput(); !reflect.DeepEqual(got, tt.output) {
+				t.Errorf("LogOutput() = %v, want %v", got, tt.output)
 			}
 		})
 	}
 }
 
-func Test_slogOut_file(t *testing.T) {
+func TestConfig_LogOutput_file(t *testing.T) {
 	logFile := filepath.Join(t.TempDir(), "test.log")
-	os.Clearenv()
-	t.Setenv("LOG_OUTPUT", logFile)
+	cfg := Config{Output: logFile}
 
-	got := LogOutput()
+	got := cfg.LogOutput()
 	lj, ok := got.(*lumberjack.Logger)
 	if !ok {
 		t.Fatalf("LogOutput() = %T, want *lumberjack.Logger", got)
@@ -201,16 +184,14 @@ func Test_slogOut_file(t *testing.T) {
 	}
 }
 
-func Test_slogOut_file_writes(t *testing.T) {
+func TestConfig_LogOutput_file_writes(t *testing.T) {
 	logFile := filepath.Join(t.TempDir(), "test.log")
-	os.Clearenv()
-	t.Setenv("LOG_OUTPUT", logFile)
-	t.Setenv("LOG_SOURCE", "false")
+	cfg := Config{Output: logFile}
 
-	logger := slog.New(slog.NewJSONHandler(LogOutput(), &slog.HandlerOptions{
+	l := slog.New(slog.NewJSONHandler(cfg.LogOutput(), &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	}))
-	logger.InfoContext(t.Context(), "test-message", "key", "test-value")
+	l.InfoContext(t.Context(), "test-message", "key", "test-value")
 
 	data, err := os.ReadFile(logFile)
 	if err != nil {
@@ -225,74 +206,62 @@ func Test_slogOut_file_writes(t *testing.T) {
 	}
 }
 
-func TestLogSource(t *testing.T) {
+func TestConfig_LogSource(t *testing.T) {
 	tests := []struct {
 		name   string
-		setup  func()
+		cfg    Config
 		source bool
 	}{
 		{
-			name:   "log source: empty",
-			setup:  func() {},
+			name:   "log source: nil (default true)",
+			cfg:    Config{},
 			source: true,
 		},
 		{
-			name: "log source: true",
-			setup: func() {
-				t.Setenv("LOG_SOURCE", "true")
-			},
+			name:   "log source: true",
+			cfg:    Config{Source: new(true)},
 			source: true,
 		},
 		{
-			name: "log source: false",
-			setup: func() {
-				t.Setenv("LOG_SOURCE", "false")
-			},
+			name:   "log source: false",
+			cfg:    Config{Source: new(false)},
 			source: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			os.Clearenv()
-			tt.setup()
-			if got := LogSource(); !reflect.DeepEqual(got, tt.source) {
+			if got := tt.cfg.LogSource(); !reflect.DeepEqual(got, tt.source) {
 				t.Errorf("LogSource() = %v, want %v", got, tt.source)
 			}
 		})
 	}
 }
 
-func TestLogFormat(t *testing.T) {
+func TestConfig_LogFormat(t *testing.T) {
 	tests := []struct {
 		name   string
-		setup  func()
+		cfg    Config
 		format slog.Handler
 	}{
 		{
 			name:   "log format: empty",
-			setup:  func() {},
+			cfg:    Config{},
 			format: slog.NewJSONHandler(os.Stdout, nil),
 		},
 		{
-			name: "log format: JSON",
-			setup: func() {
-				t.Setenv("LOG_FORMAT", "JSON")
-			},
+			name:   "log format: JSON",
+			cfg:    Config{Format: "JSON"},
 			format: slog.NewJSONHandler(os.Stdout, nil),
 		},
 		{
-			name: "log format: TEXT",
-			setup: func() {
-				t.Setenv("LOG_FORMAT", "TEXT")
-			},
+			name:   "log format: TEXT",
+			cfg:    Config{Format: "TEXT"},
 			format: slog.NewTextHandler(os.Stdout, nil),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			os.Clearenv()
-			tt.setup()
-			if got := LogFormat(); reflect.TypeOf(got) != reflect.TypeOf(tt.format) {
+			if got := tt.cfg.LogFormat(); reflect.TypeOf(got) != reflect.TypeOf(tt.format) {
 				t.Errorf("LogFormat() = %T, want %T", got, tt.format)
 			}
 		})

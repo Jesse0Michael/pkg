@@ -24,13 +24,14 @@ type App[T any] struct {
 }
 
 func NewApp[T any]() *App[T] {
-	logger.NewLogger()
-
 	ctx, cancel := Context()
 	cfg, err := config.New[T]()
 	if err != nil {
 		cancel(err)
 	}
+
+	loggerCfg, _ := structHas[logger.Config](cfg)
+	logger.NewLogger(loggerCfg)
 
 	app := &App[T]{
 		ctx:    ctx,
