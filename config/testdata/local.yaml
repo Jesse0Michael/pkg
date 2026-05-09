@@ -1,2 +1,6 @@
 environment: local
-name: test-app-local
+host: local-host
+items:
+  - local-item-1
+tags:
+  source: local

@@ -148,42 +148,110 @@ func TestLoadEnv(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
+	type testNewConfig struct {
+		Environment string            `envconfig:"ENVIRONMENT" default:"development" help:"deployment environment"`
+		Host        string            `envconfig:"HOST" default:"localhost" help:"server host"`
+		Port        int               `envconfig:"PORT" default:"8080" help:"server port"`
+		Debug       bool              `envconfig:"DEBUG" help:"enable debug mode"`
+		Rate        float64           `envconfig:"RATE" default:"1.5" help:"rate limit"`
+		Timeout     time.Duration     `envconfig:"TIMEOUT" default:"30s" help:"request timeout"`
+		Secret      string            `envconfig:"SECRET" default:"shh" arg:"-"`
+		Items       []string          `envconfig:"ITEMS"`
+		Tags        map[string]string `envconfig:"TAGS"`
+	}
 	tests := []struct {
 		name     string
 		envSetup func(t *testing.T)
 		opts     []Option
-		want     AppConfig
+		want     testNewConfig
 		wantErr  bool
 	}{
+		{
+			name:     "defaults only",
+			envSetup: func(t *testing.T) {},
+			want: testNewConfig{
+				Environment: "development",
+				Host:        "localhost",
+				Port:        8080,
+				Rate:        1.5,
+				Timeout:     30 * time.Second,
+				Secret:      "shh",
+			},
+		},
 		{
 			name: "env vars only",
 			envSetup: func(t *testing.T) {
 				t.Setenv("ENVIRONMENT", "test")
-				t.Setenv("APP_NAME", "test-app")
-				t.Setenv("VERSION", "1.0.0")
-				t.Setenv("LOG_LEVEL", "debug")
+				t.Setenv("HOST", "test-host")
+				t.Setenv("PORT", "3000")
+				t.Setenv("DEBUG", "true")
+				t.Setenv("SECRET", "test-secret")
+				t.Setenv("ITEMS", "env-item-1,env-item-2")
+				t.Setenv("TAGS", "region:us")
 			},
-			want: AppConfig{
+			want: testNewConfig{
 				Environment: "test",
-				Name:        "test-app",
-				Version:     "1.0.0",
-				LogLevel:    "debug",
+				Host:        "test-host",
+				Port:        3000,
+				Debug:       true,
+				Rate:        1.5,
+				Timeout:     30 * time.Second,
+				Secret:      "test-secret",
+				Items:       []string{"env-item-1", "env-item-2"},
+				Tags:        map[string]string{"region": "us"},
 			},
 		},
 		{
 			name: "file overrides env var",
 			envSetup: func(t *testing.T) {
 				t.Setenv("ENVIRONMENT", "test")
-				t.Setenv("APP_NAME", "test-app")
-				t.Setenv("VERSION", "1.0.0")
-				t.Setenv("LOG_LEVEL", "debug")
+				t.Setenv("HOST", "test-host")
+				t.Setenv("PORT", "3000")
 			},
 			opts: []Option{WithFile("testdata/global.json")},
-			want: AppConfig{
+			want: testNewConfig{
 				Environment: "global",
-				Name:        "test-app-global",
-				Version:     "1.0.0",
-				LogLevel:    "info",
+				Host:        "global-host",
+				Port:        9090,
+				Rate:        2.5,
+				Timeout:     30 * time.Second,
+				Secret:      "shh",
+				Items:       []string{"global-item-1", "global-item-2"},
+				Tags:        map[string]string{"source": "global", "tier": "free"},
+			},
+		},
+		{
+			name: "file replaces slice from env",
+			envSetup: func(t *testing.T) {
+				t.Setenv("ITEMS", "env-item-1,env-item-2")
+			},
+			opts: []Option{WithFile("testdata/global.json")},
+			want: testNewConfig{
+				Environment: "global",
+				Host:        "global-host",
+				Port:        9090,
+				Rate:        2.5,
+				Timeout:     30 * time.Second,
+				Secret:      "shh",
+				Items:       []string{"global-item-1", "global-item-2"},
+				Tags:        map[string]string{"source": "global", "tier": "free"},
+			},
+		},
+		{
+			name: "file merges map keys from env",
+			envSetup: func(t *testing.T) {
+				t.Setenv("TAGS", "region:us")
+			},
+			opts: []Option{WithFile("testdata/global.json")},
+			want: testNewConfig{
+				Environment: "global",
+				Host:        "global-host",
+				Port:        9090,
+				Rate:        2.5,
+				Timeout:     30 * time.Second,
+				Secret:      "shh",
+				Items:       []string{"global-item-1", "global-item-2"},
+				Tags:        map[string]string{"region": "us", "source": "global", "tier": "free"},
 			},
 		},
 		{
@@ -193,30 +261,190 @@ func TestNew(t *testing.T) {
 				WithFile("testdata/global.json"),
 				WithFile("testdata/local.yaml"),
 			},
-			want: AppConfig{
+			want: testNewConfig{
 				Environment: "local",
-				Name:        "test-app-local",
-				Version:     "1.0.0",
-				LogLevel:    "info",
+				Host:        "local-host",
+				Port:        9090,
+				Rate:        2.5,
+				Timeout:     30 * time.Second,
+				Secret:      "shh",
+				Items:       []string{"local-item-1"},
+				Tags:        map[string]string{"source": "local", "tier": "free"},
 			},
 		},
 		{
 			name: "env var used when no file overrides it",
 			envSetup: func(t *testing.T) {
-				t.Setenv("LOG_LEVEL", "warn")
+				t.Setenv("TIMEOUT", "1m")
 			},
 			opts: []Option{WithFile("testdata/local.yaml")},
-			want: AppConfig{
+			want: testNewConfig{
 				Environment: "local",
-				Name:        "test-app-local",
-				LogLevel:    "warn",
+				Host:        "local-host",
+				Port:        8080,
+				Rate:        1.5,
+				Timeout:     time.Minute,
+				Secret:      "shh",
+				Items:       []string{"local-item-1"},
+				Tags:        map[string]string{"source": "local"},
 			},
+		},
+		{
+			name:     "cli args only",
+			envSetup: func(t *testing.T) {},
+			opts:     []Option{WithArgs([]string{"--environment", "cli", "--port", "4000"})},
+			want: testNewConfig{
+				Environment: "cli",
+				Host:        "localhost",
+				Port:        4000,
+				Rate:        1.5,
+				Timeout:     30 * time.Second,
+				Secret:      "shh",
+			},
+		},
+		{
+			name: "cli args override env vars",
+			envSetup: func(t *testing.T) {
+				t.Setenv("ENVIRONMENT", "test")
+				t.Setenv("HOST", "test-host")
+				t.Setenv("SECRET", "test-secret")
+			},
+			opts: []Option{WithArgs([]string{"--environment", "cli"})},
+			want: testNewConfig{
+				Environment: "cli",
+				Host:        "test-host",
+				Port:        8080,
+				Rate:        1.5,
+				Timeout:     30 * time.Second,
+				Secret:      "test-secret",
+			},
+		},
+		{
+			name: "cli args override file values",
+			envSetup: func(t *testing.T) {
+				t.Setenv("PORT", "3000")
+			},
+			opts: []Option{
+				WithFile("testdata/global.json"),
+				WithArgs([]string{"--environment", "cli"}),
+			},
+			want: testNewConfig{
+				Environment: "cli",
+				Host:        "global-host",
+				Port:        9090,
+				Rate:        2.5,
+				Timeout:     30 * time.Second,
+				Secret:      "shh",
+				Items:       []string{"global-item-1", "global-item-2"},
+				Tags:        map[string]string{"source": "global", "tier": "free"},
+			},
+		},
+		{
+			name: "cli args do not reset unset fields",
+			envSetup: func(t *testing.T) {
+				t.Setenv("ENVIRONMENT", "test")
+				t.Setenv("HOST", "test-host")
+				t.Setenv("PORT", "3000")
+				t.Setenv("DEBUG", "true")
+				t.Setenv("RATE", "5.0")
+				t.Setenv("TIMEOUT", "1m")
+				t.Setenv("SECRET", "test-secret")
+			},
+			opts: []Option{WithArgs([]string{"--port", "4000"})},
+			want: testNewConfig{
+				Environment: "test",
+				Host:        "test-host",
+				Port:        4000,
+				Debug:       true,
+				Rate:        5.0,
+				Timeout:     time.Minute,
+				Secret:      "test-secret",
+			},
+		},
+		{
+			name: "cli default tags do not override env values",
+			envSetup: func(t *testing.T) {
+				t.Setenv("ENVIRONMENT", "production")
+				t.Setenv("HOST", "prodhost")
+				t.Setenv("PORT", "443")
+				t.Setenv("RATE", "10.0")
+				t.Setenv("TIMEOUT", "2m")
+			},
+			opts: []Option{WithArgs([]string{})},
+			want: testNewConfig{
+				Environment: "production",
+				Host:        "prodhost",
+				Port:        443,
+				Rate:        10.0,
+				Timeout:     2 * time.Minute,
+				Secret:      "shh",
+			},
+		},
+		{
+			name: "cli args replace slice",
+			envSetup: func(t *testing.T) {
+				t.Setenv("ITEMS", "env-item-1,env-item-2")
+			},
+			opts: []Option{
+				WithFile("testdata/global.json"),
+				WithArgs([]string{"--items", "cli-item-1", "cli-item-2"}),
+			},
+			want: testNewConfig{
+				Environment: "global",
+				Host:        "global-host",
+				Port:        9090,
+				Rate:        2.5,
+				Timeout:     30 * time.Second,
+				Secret:      "shh",
+				Items:       []string{"cli-item-1", "cli-item-2"},
+				Tags:        map[string]string{"source": "global", "tier": "free"},
+			},
+		},
+		{
+			name:     "bool flag without value",
+			envSetup: func(t *testing.T) {},
+			opts:     []Option{WithArgs([]string{"--debug"})},
+			want: testNewConfig{
+				Environment: "development",
+				Host:        "localhost",
+				Port:        8080,
+				Debug:       true,
+				Rate:        1.5,
+				Timeout:     30 * time.Second,
+				Secret:      "shh",
+			},
+		},
+		{
+			name:     "duration flag",
+			envSetup: func(t *testing.T) {},
+			opts:     []Option{WithArgs([]string{"--timeout", "5m"})},
+			want: testNewConfig{
+				Environment: "development",
+				Host:        "localhost",
+				Port:        8080,
+				Rate:        1.5,
+				Timeout:     5 * time.Minute,
+				Secret:      "shh",
+			},
+		},
+		{
+			name:     "arg excluded field not exposed as flag",
+			envSetup: func(t *testing.T) {},
+			opts:     []Option{WithArgs([]string{"--secret", "hacked"})},
+			wantErr:  true,
 		},
 		{
 			name:     "missing file skipped",
 			envSetup: func(t *testing.T) {},
 			opts:     []Option{WithFile("testdata/nonexistent.yaml")},
-			want:     AppConfig{},
+			want: testNewConfig{
+				Environment: "development",
+				Host:        "localhost",
+				Port:        8080,
+				Rate:        1.5,
+				Timeout:     30 * time.Second,
+				Secret:      "shh",
+			},
 		},
 		{
 			name:     "bad json file",
@@ -235,7 +463,7 @@ func TestNew(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.envSetup(t)
 
-			got, err := New[AppConfig](tt.opts...)
+			got, err := New[testNewConfig](tt.opts...)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)

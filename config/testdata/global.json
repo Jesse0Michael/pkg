@@ -1,6 +1,14 @@
 {
     "environment": "global",
-    "name": "test-app-global",
-    "version": "1.0.0",
-    "loglevel": "info"
+    "host": "global-host",
+    "port": 9090,
+    "rate": 2.5,
+    "items": [
+        "global-item-1",
+        "global-item-2"
+    ],
+    "tags": {
+        "source": "global",
+        "tier": "free"
+    }
 }

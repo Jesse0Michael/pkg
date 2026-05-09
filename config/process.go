@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/alexflint/go-arg"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"gopkg.in/yaml.v3"
@@ -15,6 +16,7 @@ import (
 type options struct {
 	prefix string
 	files  []string
+	args   []string
 }
 
 // Option configures the New function.
@@ -36,9 +38,17 @@ func WithFile(path string) Option {
 	}
 }
 
+// WithArgs enables CLI argument parsing. Pass os.Args[1:] to parse
+// command line flags into the config struct. CLI args take highest precedence.
+// Fields are exposed as flags by default; use `arg:"-"` to exclude a field.
+func WithArgs(args []string) Option {
+	return func(o *options) {
+		o.args = args
+	}
+}
+
 // New creates a config of type T by layering sources in order:
-// defaults (struct tags) < env vars < files (in order).
-// CLI args should be applied by the caller after New returns.
+// defaults (struct tags) < env vars < files (in order) < CLI args.
 func New[T any](opts ...Option) (T, error) {
 	var o options
 	for _, opt := range opts {
@@ -56,7 +66,21 @@ func New[T any](opts ...Option) (T, error) {
 		}
 	}
 
+	if o.args != nil {
+		if err := parseArgs(o.args, &cfg); err != nil {
+			return cfg, fmt.Errorf("failed to parse CLI args: %w", err)
+		}
+	}
+
 	return cfg, nil
+}
+
+func parseArgs(args []string, cfg any) error {
+	p, err := arg.NewParser(arg.Config{IgnoreEnv: true, IgnoreDefault: true}, cfg)
+	if err != nil {
+		return err
+	}
+	return p.Parse(args)
 }
 
 func loadFile(path string, cfg any) error {

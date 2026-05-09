@@ -48,3 +48,19 @@ func main() {
 	}
 }
 ```
+
+## Options
+
+`NewApp` accepts options that forward to `config.New` so you can layer config sources (env vars are always applied; files are opt-in).
+
+```go
+app := boot.NewApp[Config](
+	boot.WithConfigPrefix("APP"),
+	boot.WithConfigFile("config.yaml"),
+)
+```
+
+| Option | Forwards to | Purpose |
+| --- | --- | --- |
+| `WithConfigPrefix(prefix)` | `config.WithPrefix` | Envconfig prefix for env var resolution. |
+| `WithConfigFile(path)` | `config.WithFile` | Load JSON/YAML file. Repeat for multiple files; later files override earlier ones. |

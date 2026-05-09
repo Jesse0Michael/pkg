@@ -23,9 +23,14 @@ type App[T any] struct {
 	closers []func(context.Context) error
 }
 
-func NewApp[T any]() *App[T] {
+func NewApp[T any](opts ...Option) *App[T] {
+	var o options
+	for _, opt := range opts {
+		opt(&o)
+	}
+
 	ctx, cancel := Context()
-	cfg, err := config.New[T]()
+	cfg, err := config.New[T](o.configOpts...)
 	if err != nil {
 		cancel(err)
 	}

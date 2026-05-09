@@ -1,33 +1,91 @@
 # Config
 
-Standardizing environment configuration for GO applications
-
-Uses [godotenv](https://github.com/joho/godotenv) to load .env files from Vault into environment variables
-
-Uses [envconfig](https://github.com/kelseyhightower/envconfig) to process environment variables into config structs
-
-Contains helpful structs for common configurations to force consistency
-
-## Usage
+Configuration loading for Go applications with layered sources.
 
 ```bash
 go get github.com/jesse0michael/pkg/config
 ```
 
-``` go
-import (
-    "github.com/jesse0michael/pkg/config"
-)
+## Usage
 
+Define a config struct and call `config.New[T]()` with options to control how values are loaded.
+
+```go
 type Config struct {
-    Hostname string `envconfig:"HOSTNAME"`
-    MySQL    config.MysqlConfig
+    config.AppConfig
+    Host    string `envconfig:"HOST" default:"localhost"`
+    Port    int    `envconfig:"PORT" default:"8080"`
+    Debug   bool   `envconfig:"DEBUG"`
+    MySQL   config.MysqlConfig
 }
 
 func main() {
-    var cfg Config
-    if err := config.Process(os.Getenv("ENV_FILES_DIR"), &cfg); err != nil {
+    cfg, err := config.New[Config](
+        config.WithPrefix("MYAPP"),
+        config.WithFile("config.json"),
+        config.WithArgs(os.Args[1:]),
+    )
+    if err != nil {
         panic(err)
     }
+}
+```
+
+## Source Hierarchy
+
+Values are layered in order of increasing precedence:
+
+**struct defaults < env vars < config files (in order) < CLI args**
+
+Each layer overwrites values set by previous layers. When multiple config files are provided, they are applied in order so later files override earlier ones.
+
+### Merge Behavior
+
+- **Scalars, slices**: later layer replaces the value entirely
+- **Maps**: keys are merged across layers — later layers add or overwrite individual keys without removing existing ones
+
+### Options
+
+| Option | Description |
+|---|---|
+| `WithPrefix(prefix)` | Namespace env vars with a prefix (e.g. `MYAPP_HOST`) |
+| `WithFile(path)` | Load a JSON or YAML config file. Missing files are silently skipped. Can be called multiple times; files are applied in order |
+| `WithArgs(args)` | Parse CLI flags into the config struct. Pass `os.Args[1:]`. Fields are exposed as flags by default; use `arg:"-"` to exclude a field |
+
+## Config File Example
+
+JSON:
+```json
+{
+    "host": "production-host",
+    "port": 9090
+}
+```
+
+YAML:
+```yaml
+host: production-host
+port: 9090
+```
+
+## Common Config Structs
+
+| Struct | Description |
+|---|---|
+| `AppConfig` | Environment, app name, version, log level |
+| `MysqlConfig` | MySQL connection with `ConnectionString()` and client constructor |
+| `PostgresConfig` | Postgres connection with pool settings and `ConnectionString()` |
+| `RedisConfig` | Redis connection with TLS and timeout settings |
+| `FirestoreConfig` | Firestore API key and client constructor |
+| `OpenTelemetryConfig` | OTLP exporter endpoint, TLS, and sample rate |
+
+## Legacy Usage
+
+The `Process` function loads `.env` files from a directory and processes env vars into a config struct:
+
+```go
+var cfg Config
+if err := config.Process(os.Getenv("ENV_FILES_DIR"), &cfg); err != nil {
+    panic(err)
 }
 ```
