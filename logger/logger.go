@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 // NewLogger sets and returns a new default logger.
@@ -46,15 +48,23 @@ func LogLevel() slog.Leveler {
 }
 
 // LogOutput returns the slog output from the LOG_OUTPUT environment variable.
+// Supports "STDOUT", "STDERR", or a file path with automatic log rotation.
 // Defaults to os.Stdout.
 func LogOutput() io.Writer {
-	switch strings.ToUpper(os.Getenv("LOG_OUTPUT")) {
-	case "STDOUT":
+	output := os.Getenv("LOG_OUTPUT")
+	switch strings.ToUpper(output) {
+	case "STDOUT", "":
 		return os.Stdout
 	case "STDERR":
 		return os.Stderr
 	default:
-		return os.Stdout
+		return &lumberjack.Logger{
+			Filename:   output,
+			MaxSize:    100,
+			MaxBackups: 3,
+			MaxAge:     28,
+			Compress:   true,
+		}
 	}
 }
 

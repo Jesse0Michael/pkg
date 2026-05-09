@@ -8,11 +8,14 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"strings"
 	"testing"
 	"time"
+
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 func ExampleNewLogger() {
@@ -180,6 +183,45 @@ func Test_slogOut(t *testing.T) {
 				t.Errorf("slogOutput() = %v, want %v", got, tt.output)
 			}
 		})
+	}
+}
+
+func Test_slogOut_file(t *testing.T) {
+	logFile := filepath.Join(t.TempDir(), "test.log")
+	os.Clearenv()
+	t.Setenv("LOG_OUTPUT", logFile)
+
+	got := LogOutput()
+	lj, ok := got.(*lumberjack.Logger)
+	if !ok {
+		t.Fatalf("LogOutput() = %T, want *lumberjack.Logger", got)
+	}
+	if lj.Filename != logFile {
+		t.Errorf("Filename = %v, want %v", lj.Filename, logFile)
+	}
+}
+
+func Test_slogOut_file_writes(t *testing.T) {
+	logFile := filepath.Join(t.TempDir(), "test.log")
+	os.Clearenv()
+	t.Setenv("LOG_OUTPUT", logFile)
+	t.Setenv("LOG_SOURCE", "false")
+
+	logger := slog.New(slog.NewJSONHandler(LogOutput(), &slog.HandlerOptions{
+		Level: slog.LevelInfo,
+	}))
+	logger.InfoContext(t.Context(), "test-message", "key", "test-value")
+
+	data, err := os.ReadFile(logFile)
+	if err != nil {
+		t.Fatalf("reading log file: %v", err)
+	}
+	content := string(data)
+	if !strings.Contains(content, "test-message") {
+		t.Errorf("log file missing message, got: %s", content)
+	}
+	if !strings.Contains(content, "test-value") {
+		t.Errorf("log file missing attribute, got: %s", content)
 	}
 }
 
