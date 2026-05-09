@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/config` will be documented in this file by Release Please.
 
+## [0.8.0](https://github.com/Jesse0Michael/pkg/compare/config/v0.7.0...config/v0.8.0) (2026-05-09)
+
+
+### Features
+
+* add file config processing ([dd76993](https://github.com/Jesse0Michael/pkg/commit/dd76993c9a2d3027352ee1f980c677ecd83db1b3))
+
 ## [0.7.0](https://github.com/Jesse0Michael/pkg/compare/config/v0.6.0...config/v0.7.0) (2026-04-25)
 
 

@@ -2,6 +2,18 @@
 
 All notable changes to `github.com/jesse0michael/pkg/logger` will be documented in this file by Release Please.
 
+## [1.0.0](https://github.com/Jesse0Michael/pkg/compare/logger/v0.5.0...logger/v1.0.0) (2026-05-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* NewLogger now accepts a logger.Config struct instead of reading environment variables directly. LogLevel, LogOutput, LogSource, and LogFormat are now methods on Config.
+
+### Features
+
+* require Config parameter for logger.NewLogger ([0bbb1ff](https://github.com/Jesse0Michael/pkg/commit/0bbb1ffcbe30bc92d8780fed2c4468f0e557934e))
+* support file output logging ([f163ba7](https://github.com/Jesse0Michael/pkg/commit/f163ba7feb476a10d9557234a952644badace6a0))
+
 ## [0.5.0](https://github.com/Jesse0Michael/pkg/compare/logger/v0.4.0...logger/v0.5.0) (2026-04-25)
 
 
