@@ -1,19 +1,82 @@
 package config
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
+	"gopkg.in/yaml.v3"
 )
 
-// New creates and processes a generic type T with envconfig environment variables
-func New[T any]() (T, error) {
+type options struct {
+	prefix string
+	files  []string
+}
+
+// Option configures the New function.
+type Option func(*options)
+
+// WithPrefix sets the envconfig prefix for env var resolution.
+func WithPrefix(prefix string) Option {
+	return func(o *options) {
+		o.prefix = prefix
+	}
+}
+
+// WithFile adds a config file to be loaded. Files are applied in order,
+// so later files override earlier ones. Supports JSON and YAML.
+// Files that don't exist are silently skipped.
+func WithFile(path string) Option {
+	return func(o *options) {
+		o.files = append(o.files, path)
+	}
+}
+
+// New creates a config of type T by layering sources in order:
+// defaults (struct tags) < env vars < files (in order).
+// CLI args should be applied by the caller after New returns.
+func New[T any](opts ...Option) (T, error) {
+	var o options
+	for _, opt := range opts {
+		opt(&o)
+	}
+
 	var cfg T
-	err := envconfig.Process("", &cfg)
-	return cfg, err
+	if err := envconfig.Process(o.prefix, &cfg); err != nil {
+		return cfg, fmt.Errorf("failed to process env config: %w", err)
+	}
+
+	for _, path := range o.files {
+		if err := loadFile(path, &cfg); err != nil {
+			return cfg, fmt.Errorf("failed to load config file %s: %w", path, err)
+		}
+	}
+
+	return cfg, nil
+}
+
+func loadFile(path string, cfg any) error {
+	data, err := os.ReadFile(filepath.Clean(path))
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+
+	ext := filepath.Ext(path)
+	switch ext {
+	case ".json":
+		return json.Unmarshal(data, cfg)
+	case ".yaml", ".yml":
+		return yaml.Unmarshal(data, cfg)
+	default:
+		return fmt.Errorf("unsupported config file format: %s", ext)
+	}
 }
 
 // Process loads environment variables from .env files in the specified directory

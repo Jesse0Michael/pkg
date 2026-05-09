@@ -148,31 +148,109 @@ func TestLoadEnv(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	// Test success case
-	t.Setenv("ENVIRONMENT", "test")
-	t.Setenv("APP_NAME", "test-app")
-	t.Setenv("VERSION", "1.0.0")
-	t.Setenv("LOG_LEVEL", "debug")
+	tests := []struct {
+		name     string
+		envSetup func(t *testing.T)
+		opts     []Option
+		want     AppConfig
+		wantErr  bool
+	}{
+		{
+			name: "env vars only",
+			envSetup: func(t *testing.T) {
+				t.Setenv("ENVIRONMENT", "test")
+				t.Setenv("APP_NAME", "test-app")
+				t.Setenv("VERSION", "1.0.0")
+				t.Setenv("LOG_LEVEL", "debug")
+			},
+			want: AppConfig{
+				Environment: "test",
+				Name:        "test-app",
+				Version:     "1.0.0",
+				LogLevel:    "debug",
+			},
+		},
+		{
+			name: "file overrides env var",
+			envSetup: func(t *testing.T) {
+				t.Setenv("ENVIRONMENT", "test")
+				t.Setenv("APP_NAME", "test-app")
+				t.Setenv("VERSION", "1.0.0")
+				t.Setenv("LOG_LEVEL", "debug")
+			},
+			opts: []Option{WithFile("testdata/global.json")},
+			want: AppConfig{
+				Environment: "global",
+				Name:        "test-app-global",
+				Version:     "1.0.0",
+				LogLevel:    "info",
+			},
+		},
+		{
+			name:     "later file overrides earlier file",
+			envSetup: func(t *testing.T) {},
+			opts: []Option{
+				WithFile("testdata/global.json"),
+				WithFile("testdata/local.yaml"),
+			},
+			want: AppConfig{
+				Environment: "local",
+				Name:        "test-app-local",
+				Version:     "1.0.0",
+				LogLevel:    "info",
+			},
+		},
+		{
+			name: "env var used when no file overrides it",
+			envSetup: func(t *testing.T) {
+				t.Setenv("LOG_LEVEL", "warn")
+			},
+			opts: []Option{WithFile("testdata/local.yaml")},
+			want: AppConfig{
+				Environment: "local",
+				Name:        "test-app-local",
+				LogLevel:    "warn",
+			},
+		},
+		{
+			name:     "missing file skipped",
+			envSetup: func(t *testing.T) {},
+			opts:     []Option{WithFile("testdata/nonexistent.yaml")},
+			want:     AppConfig{},
+		},
+		{
+			name:     "bad json file",
+			envSetup: func(t *testing.T) {},
+			opts:     []Option{WithFile("testdata/bad.json")},
+			wantErr:  true,
+		},
+		{
+			name:     "unsupported file format",
+			envSetup: func(t *testing.T) {},
+			opts:     []Option{WithFile("testdata/ingored_file")},
+			wantErr:  true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.envSetup(t)
 
-	got, err := New[AppConfig]()
-	if err != nil {
-		t.Errorf("New[AppConfig]() error = %v, want nil", err)
+			got, err := New[AppConfig](tt.opts...)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !tt.wantErr && !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("New() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 
-	want := AppConfig{
-		Environment: "test",
-		Name:        "test-app",
-		Version:     "1.0.0",
-		LogLevel:    "debug",
-	}
-
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("New[AppConfig]() = %v, want %v", got, want)
-	}
-
-	// Test failure case
-	_, err = New[map[string]string]()
-	if err == nil {
-		t.Error("New[map[string]string]() should have failed")
-	}
+	t.Run("invalid type", func(t *testing.T) {
+		_, err := New[map[string]string]()
+		if err == nil {
+			t.Error("New[map[string]string]() should have failed")
+		}
+	})
 }
