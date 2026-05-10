@@ -34,9 +34,21 @@ func main() {
 
 Values are layered in order of increasing precedence:
 
-**struct defaults < env vars < config files (in order) < CLI args**
+**`Init()` < struct defaults < env vars < config files (in order) < CLI args**
 
 Each layer overwrites values set by previous layers. When multiple config files are provided, they are applied in order so later files override earlier ones.
+
+### Initializer
+
+Config structs can implement the `Initializer` interface to set dynamic initial values before any other source is applied:
+
+```go
+type Initializer interface {
+    Init()
+}
+```
+
+`AppConfig` implements this to populate `Name` and `Version` from Go build info (`runtime/debug.ReadBuildInfo`), giving you the module name and VCS revision automatically without env vars.
 
 ### Merge Behavior
 
@@ -84,7 +96,7 @@ port: 9090
 
 | Struct | Description |
 |---|---|
-| `AppConfig` | Environment, app name, version, log level |
+| `AppConfig` | Environment, app name, version — auto-populated from build info via `Init()` |
 | `MysqlConfig` | MySQL connection with `ConnectionString()` and client constructor |
 | `PostgresConfig` | Postgres connection with pool settings and `ConnectionString()` |
 | `RedisConfig` | Redis connection with TLS and timeout settings |

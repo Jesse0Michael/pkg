@@ -60,9 +60,9 @@ func main() {
 
 Configuration is loaded using the `config` package with the following precedence:
 
-**struct defaults < env vars < config files (in order) < CLI args**
+**`Init()` < struct defaults < env vars < config files (in order) < CLI args**
 
-CLI arguments from `os.Args[1:]` are automatically parsed into the config struct. Use `arg:"-"` to exclude fields. See the [config README](../config/README.md) for full details.
+CLI arguments from `os.Args[1:]` are automatically parsed into the config struct. Use `arg:"-"` to exclude fields. Config structs can implement `config.Initializer` to set dynamic initial values (e.g. `AppConfig` auto-populates name and version from build info). See the [config README](../config/README.md) for full details.
 
 ```go
 app := boot.NewApp[Config](
@@ -70,19 +70,3 @@ app := boot.NewApp[Config](
     boot.WithConfigFile("config.yaml"),
 )
 ```
-
-## Options
-
-`NewApp` accepts options that forward to `config.New` so you can layer config sources (env vars are always applied; files are opt-in).
-
-```go
-app := boot.NewApp[Config](
-	boot.WithConfigPrefix("APP"),
-	boot.WithConfigFile("config.yaml"),
-)
-```
-
-| Option | Forwards to | Purpose |
-| --- | --- | --- |
-| `WithConfigPrefix(prefix)` | `config.WithPrefix` | Envconfig prefix for env var resolution. |
-| `WithConfigFile(path)` | `config.WithFile` | Load JSON/YAML file. Repeat for multiple files; later files override earlier ones. |

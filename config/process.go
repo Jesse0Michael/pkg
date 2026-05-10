@@ -37,8 +37,14 @@ func WithFile(path string) Option {
 	}
 }
 
+// Initializer can be implemented by config structs to set dynamic initial values
+// before other sources (env vars, files, CLI args) are applied.
+type Initializer interface {
+	Init()
+}
+
 // New creates a config of type T by layering sources in order:
-// defaults (struct tags) < env vars < files (in order) < CLI args.
+// init < struct tag defaults + env vars < files (in order) < CLI args.
 func New[T any](opts ...Option) (T, error) {
 	var o options
 	for _, opt := range opts {
@@ -46,6 +52,10 @@ func New[T any](opts ...Option) (T, error) {
 	}
 
 	var cfg T
+	if d, ok := any(&cfg).(Initializer); ok {
+		d.Init()
+	}
+
 	if err := envconfig.Process(o.prefix, &cfg); err != nil {
 		return cfg, fmt.Errorf("failed to process env config: %w", err)
 	}

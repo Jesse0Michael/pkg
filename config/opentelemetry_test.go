@@ -164,7 +164,7 @@ func Test_otelResource(t *testing.T) {
 		},
 		{
 			name:       "with config",
-			cfg:        AppConfig{Environment: "local", Name: "app", Version: "1.0.0", LogLevel: "debug"},
+			cfg:        AppConfig{Environment: "local", Name: "app", Version: "1.0.0"},
 			attributes: []attribute.KeyValue{},
 			want: func() *resource.Resource {
 				r, _ := resource.New(t.Context(),
@@ -181,7 +181,7 @@ func Test_otelResource(t *testing.T) {
 		},
 		{
 			name:       "with attributes",
-			cfg:        AppConfig{Environment: "local", Name: "app", Version: "1.0.0", LogLevel: "debug"},
+			cfg:        AppConfig{Environment: "local", Name: "app", Version: "1.0.0"},
 			attributes: []attribute.KeyValue{attribute.String("test.id", "test")},
 			want: func() *resource.Resource {
 				r, _ := resource.New(t.Context(),
