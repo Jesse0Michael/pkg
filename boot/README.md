@@ -51,6 +51,28 @@ func main() {
 
 ## Options
 
+`NewApp` accepts options to configure how the underlying `config.New[T]()` loads configuration.
+
+| Option | Description |
+|---|---|
+| `WithConfigPrefix(prefix)` | Namespace env vars with a prefix (e.g. `MYAPP_HOST`) |
+| `WithConfigFile(path)` | Load a JSON or YAML config file. Can be called multiple times; files are applied in order |
+
+Configuration is loaded using the `config` package with the following precedence:
+
+**struct defaults < env vars < config files (in order) < CLI args**
+
+CLI arguments from `os.Args[1:]` are automatically parsed into the config struct. Use `arg:"-"` to exclude fields. See the [config README](../config/README.md) for full details.
+
+```go
+app := boot.NewApp[Config](
+    boot.WithConfigPrefix("MYAPP"),
+    boot.WithConfigFile("config.yaml"),
+)
+```
+
+## Options
+
 `NewApp` accepts options that forward to `config.New` so you can layer config sources (env vars are always applied; files are opt-in).
 
 ```go

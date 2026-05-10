@@ -162,6 +162,7 @@ func TestNew(t *testing.T) {
 	tests := []struct {
 		name     string
 		envSetup func(t *testing.T)
+		args     []string
 		opts     []Option
 		want     testNewConfig
 		wantErr  bool
@@ -292,7 +293,7 @@ func TestNew(t *testing.T) {
 		{
 			name:     "cli args only",
 			envSetup: func(t *testing.T) {},
-			opts:     []Option{WithArgs([]string{"--environment", "cli", "--port", "4000"})},
+			args:     []string{"--environment", "cli", "--port", "4000"},
 			want: testNewConfig{
 				Environment: "cli",
 				Host:        "localhost",
@@ -309,7 +310,7 @@ func TestNew(t *testing.T) {
 				t.Setenv("HOST", "test-host")
 				t.Setenv("SECRET", "test-secret")
 			},
-			opts: []Option{WithArgs([]string{"--environment", "cli"})},
+			args: []string{"--environment", "cli"},
 			want: testNewConfig{
 				Environment: "cli",
 				Host:        "test-host",
@@ -324,9 +325,9 @@ func TestNew(t *testing.T) {
 			envSetup: func(t *testing.T) {
 				t.Setenv("PORT", "3000")
 			},
+			args: []string{"--environment", "cli"},
 			opts: []Option{
 				WithFile("testdata/global.json"),
-				WithArgs([]string{"--environment", "cli"}),
 			},
 			want: testNewConfig{
 				Environment: "cli",
@@ -350,7 +351,7 @@ func TestNew(t *testing.T) {
 				t.Setenv("TIMEOUT", "1m")
 				t.Setenv("SECRET", "test-secret")
 			},
-			opts: []Option{WithArgs([]string{"--port", "4000"})},
+			args: []string{"--port", "4000"},
 			want: testNewConfig{
 				Environment: "test",
 				Host:        "test-host",
@@ -370,7 +371,7 @@ func TestNew(t *testing.T) {
 				t.Setenv("RATE", "10.0")
 				t.Setenv("TIMEOUT", "2m")
 			},
-			opts: []Option{WithArgs([]string{})},
+			args: []string{},
 			want: testNewConfig{
 				Environment: "production",
 				Host:        "prodhost",
@@ -385,9 +386,9 @@ func TestNew(t *testing.T) {
 			envSetup: func(t *testing.T) {
 				t.Setenv("ITEMS", "env-item-1,env-item-2")
 			},
+			args: []string{"--items", "cli-item-1", "cli-item-2"},
 			opts: []Option{
 				WithFile("testdata/global.json"),
-				WithArgs([]string{"--items", "cli-item-1", "cli-item-2"}),
 			},
 			want: testNewConfig{
 				Environment: "global",
@@ -403,7 +404,7 @@ func TestNew(t *testing.T) {
 		{
 			name:     "bool flag without value",
 			envSetup: func(t *testing.T) {},
-			opts:     []Option{WithArgs([]string{"--debug"})},
+			args:     []string{"--debug"},
 			want: testNewConfig{
 				Environment: "development",
 				Host:        "localhost",
@@ -417,7 +418,7 @@ func TestNew(t *testing.T) {
 		{
 			name:     "duration flag",
 			envSetup: func(t *testing.T) {},
-			opts:     []Option{WithArgs([]string{"--timeout", "5m"})},
+			args:     []string{"--timeout", "5m"},
 			want: testNewConfig{
 				Environment: "development",
 				Host:        "localhost",
@@ -428,10 +429,17 @@ func TestNew(t *testing.T) {
 			},
 		},
 		{
-			name:     "arg excluded field not exposed as flag",
+			name:     "arg excluded field is ignored",
 			envSetup: func(t *testing.T) {},
-			opts:     []Option{WithArgs([]string{"--secret", "hacked"})},
-			wantErr:  true,
+			args:     []string{"--secret", "hacked"},
+			want: testNewConfig{
+				Environment: "development",
+				Host:        "localhost",
+				Port:        8080,
+				Rate:        1.5,
+				Timeout:     30 * time.Second,
+				Secret:      "shh",
+			},
 		},
 		{
 			name:     "missing file skipped",
@@ -462,6 +470,10 @@ func TestNew(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.envSetup(t)
+
+			orig := os.Args
+			os.Args = append([]string{"test"}, tt.args...)
+			t.Cleanup(func() { os.Args = orig })
 
 			got, err := New[testNewConfig](tt.opts...)
 

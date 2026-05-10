@@ -23,7 +23,6 @@ func main() {
     cfg, err := config.New[Config](
         config.WithPrefix("MYAPP"),
         config.WithFile("config.json"),
-        config.WithArgs(os.Args[1:]),
     )
     if err != nil {
         panic(err)
@@ -50,7 +49,20 @@ Each layer overwrites values set by previous layers. When multiple config files 
 |---|---|
 | `WithPrefix(prefix)` | Namespace env vars with a prefix (e.g. `MYAPP_HOST`) |
 | `WithFile(path)` | Load a JSON or YAML config file. Missing files are silently skipped. Can be called multiple times; files are applied in order |
-| `WithArgs(args)` | Parse CLI flags into the config struct. Pass `os.Args[1:]`. Fields are exposed as flags by default; use `arg:"-"` to exclude a field |
+
+### CLI Args
+
+CLI arguments from `os.Args[1:]` are automatically parsed into the config struct.
+Fields are exposed as flags by default; use `arg:"-"` to exclude a field.
+Unknown arguments are silently ignored.
+
+```go
+type Config struct {
+    Host   string `envconfig:"HOST" default:"localhost" help:"server host"`
+    Port   int    `envconfig:"PORT" default:"8080" help:"server port"`
+    Secret string `envconfig:"SECRET" arg:"-"`
+}
+```
 
 ## Config File Example
 

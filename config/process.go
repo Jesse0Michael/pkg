@@ -16,7 +16,6 @@ import (
 type options struct {
 	prefix string
 	files  []string
-	args   []string
 }
 
 // Option configures the New function.
@@ -35,15 +34,6 @@ func WithPrefix(prefix string) Option {
 func WithFile(path string) Option {
 	return func(o *options) {
 		o.files = append(o.files, path)
-	}
-}
-
-// WithArgs enables CLI argument parsing. Pass os.Args[1:] to parse
-// command line flags into the config struct. CLI args take highest precedence.
-// Fields are exposed as flags by default; use `arg:"-"` to exclude a field.
-func WithArgs(args []string) Option {
-	return func(o *options) {
-		o.args = args
 	}
 }
 
@@ -66,10 +56,8 @@ func New[T any](opts ...Option) (T, error) {
 		}
 	}
 
-	if o.args != nil {
-		if err := parseArgs(o.args, &cfg); err != nil {
-			return cfg, fmt.Errorf("failed to parse CLI args: %w", err)
-		}
+	if err := parseArgs(os.Args[1:], &cfg); err != nil {
+		return cfg, fmt.Errorf("failed to parse CLI args: %w", err)
 	}
 
 	return cfg, nil
@@ -80,7 +68,10 @@ func parseArgs(args []string, cfg any) error {
 	if err != nil {
 		return err
 	}
-	return p.Parse(args)
+	if err := p.Parse(args); err != nil && !strings.HasPrefix(err.Error(), "unknown argument") {
+		return err
+	}
+	return nil
 }
 
 func loadFile(path string, cfg any) error {
