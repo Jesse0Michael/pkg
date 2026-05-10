@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/boot` will be documented in this file by Release Please.
 
+## [1.2.0](https://github.com/Jesse0Michael/pkg/compare/boot/v1.1.0...boot/v1.2.0) (2026-05-10)
+
+
+### Features
+
+* support cli args in config ([46606a3](https://github.com/Jesse0Michael/pkg/commit/46606a33fe6442d2a5e066e186cbac7adc6b3f37))
+
 ## [1.1.0](https://github.com/Jesse0Michael/pkg/compare/boot/v1.0.0...boot/v1.1.0) (2026-05-09)
 
 
