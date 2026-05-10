@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/config` will be documented in this file by Release Please.
 
+## [0.11.0](https://github.com/Jesse0Michael/pkg/compare/config/v0.10.0...config/v0.11.0) (2026-05-10)
+
+
+### Features
+
+* config initializer ([199bb47](https://github.com/Jesse0Michael/pkg/commit/199bb47553994bca735468154381bf3afeb42034))
+
 ## [0.10.0](https://github.com/Jesse0Michael/pkg/compare/config/v0.9.0...config/v0.10.0) (2026-05-10)
 
 

@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/boot` will be documented in this file by Release Please.
 
+## [1.3.0](https://github.com/Jesse0Michael/pkg/compare/boot/v1.2.0...boot/v1.3.0) (2026-05-10)
+
+
+### Features
+
+* config initializer ([199bb47](https://github.com/Jesse0Michael/pkg/commit/199bb47553994bca735468154381bf3afeb42034))
+
 ## [1.2.0](https://github.com/Jesse0Michael/pkg/compare/boot/v1.1.0...boot/v1.2.0) (2026-05-10)
 
 
