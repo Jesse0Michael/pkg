@@ -46,12 +46,14 @@ func Validate(v *validator.Validate) func(any) error {
 }
 
 func Encode(w http.ResponseWriter, status int, v any) error {
-	w.WriteHeader(status)
 	if v != nil {
 		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(status)
 		if err := json.NewEncoder(w).Encode(v); err != nil {
 			return fmt.Errorf("failed to encode json: %w", err)
 		}
+	} else {
+		w.WriteHeader(status)
 	}
 	return nil
 }
