@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/auth` will be documented in this file by Release Please.
 
+## [0.7.0](https://github.com/Jesse0Michael/pkg/compare/auth/v0.6.0...auth/v0.7.0) (2026-07-23)
+
+
+### Features
+
+* **auth:** implement Google OIDC authentication ([dd1cad4](https://github.com/Jesse0Michael/pkg/commit/dd1cad40576ec8677fe821eb63ca27424fffc5cd))
+
 ## [0.6.0](https://github.com/Jesse0Michael/pkg/compare/auth/v0.5.0...auth/v0.6.0) (2026-04-26)
 
 
