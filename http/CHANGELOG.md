@@ -2,6 +2,18 @@
 
 All notable changes to `github.com/jesse0michael/pkg/http` will be documented in this file by Release Please.
 
+## [0.8.0](https://github.com/Jesse0Michael/pkg/compare/http/v0.7.1...http/v0.8.0) (2026-07-23)
+
+
+### Features
+
+* **auth:** implement Google OIDC authentication ([dd1cad4](https://github.com/Jesse0Michael/pkg/commit/dd1cad40576ec8677fe821eb63ca27424fffc5cd))
+
+
+### Bug Fixes
+
+* ensure response status is set correctly in Encode function ([23d1bbd](https://github.com/Jesse0Michael/pkg/commit/23d1bbde0d91884e26a6f20e3e254912455111e5))
+
 ## [0.7.1](https://github.com/Jesse0Michael/pkg/compare/http/v0.7.0...http/v0.7.1) (2026-04-28)
 
 
