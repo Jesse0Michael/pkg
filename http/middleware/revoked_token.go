@@ -14,8 +14,8 @@ func RevokedToken(checker auth.RevokedTokenChecker) func(http.Handler) http.Hand
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			jti, ok := auth.JTI(r.Context())
 			if !ok {
-				w.WriteHeader(http.StatusUnauthorized)
 				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusUnauthorized)
 				_, _ = w.Write([]byte(`{"errors":[{"message":"unauthorized"}]}`))
 				return
 			}
@@ -28,8 +28,8 @@ func RevokedToken(checker auth.RevokedTokenChecker) func(http.Handler) http.Hand
 			}
 			if revoked {
 				slog.WarnContext(r.Context(), "revoked token rejected", "jti", jti)
-				w.WriteHeader(http.StatusUnauthorized)
 				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusUnauthorized)
 				_, _ = w.Write([]byte(`{"errors":[{"message":"unauthorized"}]}`))
 				return
 			}

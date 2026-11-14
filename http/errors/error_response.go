@@ -78,6 +78,7 @@ func WriteError(ctx context.Context, w http.ResponseWriter, errs ...error) {
 	if errResponse.Code >= http.StatusInternalServerError {
 		span.RecordError(errResponse)
 	}
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(errResponse.Code)
 	b, _ := json.Marshal(errResponse)
 	_, _ = w.Write(b)

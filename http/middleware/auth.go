@@ -17,9 +17,9 @@ func Auth(a Authenticator) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx, ok := authenticate(r, a)
 			if !ok {
-				w.WriteHeader(http.StatusForbidden)
 				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{"errors":[{"message":"forbidden"}]}`))
+				w.WriteHeader(http.StatusUnauthorized)
+				_, _ = w.Write([]byte(`{"errors":[{"message":"unauthorized"}]}`))
 				return
 			}
 			next.ServeHTTP(w, r.WithContext(ctx))
@@ -44,8 +44,8 @@ func RejectReadOnly(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		readOnly, _ := auth.ReadOnly(r.Context())
 		if readOnly {
-			w.WriteHeader(http.StatusUnauthorized)
 			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
 			_, _ = w.Write([]byte(`{"errors":[{"message":"unauthorized"}]}`))
 			return
 		}

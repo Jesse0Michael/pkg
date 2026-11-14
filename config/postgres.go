@@ -2,6 +2,9 @@ package config
 
 import (
 	"fmt"
+	"net"
+	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/XSAM/otelsql"
@@ -35,9 +38,22 @@ func (p PostgresConfig) ConnectionString() string {
 		p.SSLMode)
 }
 
+// ConnectionURL is the URL form of the connection string, the only form the
+// Splunk instrumentation can parse a peer host and port from.
+func (p PostgresConfig) ConnectionURL() string {
+	u := url.URL{
+		Scheme:   "postgres",
+		User:     url.UserPassword(p.User, p.Password),
+		Host:     net.JoinHostPort(p.Host, strconv.Itoa(p.Port)),
+		Path:     p.Database,
+		RawQuery: url.Values{"sslmode": {p.SSLMode}}.Encode(),
+	}
+	return u.String()
+}
+
 func NewPostgresClient(cfg PostgresConfig) (*sqlx.DB, error) {
 	postgresAttrs := []attribute.KeyValue{attribute.String("service.name", "postgres")}
-	db, err := splunksqlx.Connect("postgres", cfg.ConnectionString(),
+	db, err := splunksqlx.Connect("postgres", cfg.ConnectionURL(),
 		splunksql.WithAttributes(postgresAttrs),
 	)
 	if err != nil {

@@ -31,12 +31,14 @@ func NewApp[T any](opts ...Option) *App[T] {
 
 	ctx, cancel := Context()
 	cfg, err := config.New[T](o.configOpts...)
-	if err != nil {
-		cancel(err)
-	}
 
 	loggerCfg, _ := structHas[logger.Config](cfg)
 	logger.NewLogger(loggerCfg)
+
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to load config", "err", err)
+		cancel(err)
+	}
 
 	app := &App[T]{
 		ctx:    ctx,
@@ -68,8 +70,8 @@ func (a *App[T]) Cancel(cause error) {
 }
 
 func (a *App[T]) Run(runners ...Runner[T]) error {
-	if err := a.ctx.Err(); err != nil {
-		return err
+	if a.ctx.Err() != nil {
+		return context.Cause(a.ctx)
 	}
 
 	var wg sync.WaitGroup
@@ -87,8 +89,8 @@ func (a *App[T]) Run(runners ...Runner[T]) error {
 	handlers.ServeHealthCheckMetrics(a.ctx)
 
 	<-a.ctx.Done()
-	if err := a.ctx.Err(); err != nil && !errors.Is(err, context.Canceled) {
-		slog.Error("app done with error", "error", err)
+	if err := context.Cause(a.ctx); err != nil && !errors.Is(err, context.Canceled) {
+		slog.Error("app done with error", "err", err)
 		return err
 	}
 
