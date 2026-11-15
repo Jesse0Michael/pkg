@@ -2,6 +2,19 @@
 
 All notable changes to `github.com/jesse0michael/pkg/config` will be documented in this file by Release Please.
 
+## [0.12.0](https://github.com/Jesse0Michael/pkg/compare/config/v0.11.0...config/v0.12.0) (2026-11-15)
+
+
+### Features
+
+* config storage ([51fa294](https://github.com/Jesse0Michael/pkg/commit/51fa29460247a9ff35295cd7141a0f3dd677aebe))
+* support POSTGRES_URL ([d92aa0d](https://github.com/Jesse0Michael/pkg/commit/d92aa0d309536f49090e3d443f02e7276d1c9821))
+
+
+### Bug Fixes
+
+* proposed package fixes ([0db629a](https://github.com/Jesse0Michael/pkg/commit/0db629acb709aa96e358c073fcc60d374fe260ab))
+
 ## [0.11.0](https://github.com/Jesse0Michael/pkg/compare/config/v0.10.0...config/v0.11.0) (2026-05-10)
 
 

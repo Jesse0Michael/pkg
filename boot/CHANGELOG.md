@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/boot` will be documented in this file by Release Please.
 
+## [1.3.1](https://github.com/Jesse0Michael/pkg/compare/boot/v1.3.0...boot/v1.3.1) (2026-11-15)
+
+
+### Bug Fixes
+
+* proposed package fixes ([0db629a](https://github.com/Jesse0Michael/pkg/commit/0db629acb709aa96e358c073fcc60d374fe260ab))
+
 ## [1.3.0](https://github.com/Jesse0Michael/pkg/compare/boot/v1.2.0...boot/v1.3.0) (2026-05-10)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/Jesse0Michael/pkg/compare/grpc/v1.6.0...grpc/v1.6.1) (2026-11-15)
+
+
+### Bug Fixes
+
+* make generate ([025ca7a](https://github.com/Jesse0Michael/pkg/commit/025ca7ac06e3c8a59fe2b48533d7a7ec2ecee15c))
+
 ## [1.6.0](https://github.com/Jesse0Michael/pkg/compare/grpc/v1.5.0...grpc/v1.6.0) (2026-04-26)
 
 
