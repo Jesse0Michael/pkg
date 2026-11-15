@@ -2,6 +2,13 @@
 
 All notable changes to `github.com/jesse0michael/pkg/http` will be documented in this file by Release Please.
 
+## [0.8.1](https://github.com/Jesse0Michael/pkg/compare/http/v0.8.0...http/v0.8.1) (2026-11-15)
+
+
+### Bug Fixes
+
+* proposed package fixes ([0db629a](https://github.com/Jesse0Michael/pkg/commit/0db629acb709aa96e358c073fcc60d374fe260ab))
+
 ## [0.8.0](https://github.com/Jesse0Michael/pkg/compare/http/v0.7.1...http/v0.8.0) (2026-07-23)
 
 
