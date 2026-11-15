@@ -100,8 +100,40 @@ port: 9090
 | `MysqlConfig` | MySQL connection with `ConnectionString()` and client constructor |
 | `PostgresConfig` | Postgres connection with pool settings and `ConnectionString()` |
 | `RedisConfig` | Redis connection with TLS and timeout settings |
+| `AWSConfig` | AWS SDK region, profile and static credentials with `NewAWSConfig` |
+| `S3Config` | AWS S3 or S3-compatible bucket (MinIO, Cloudflare R2, Google Cloud Storage, ...) with `NewS3Client` and `NewS3PresignClient` |
 | `FirestoreConfig` | Firestore API key and client constructor |
 | `OpenTelemetryConfig` | OTLP exporter endpoint, TLS, and sample rate |
+
+### AWSConfig
+
+`NewAWSConfig(ctx, cfg)` returns the `aws.Config` shared by every AWS client. Every field is an optional override; anything left empty is resolved by the SDK's default chain (`AWS_*` env vars, shared config and credentials files, SSO, web identity roles, instance roles).
+
+| Variable | Description |
+|---|---|
+| `AWS_REGION` | Region |
+| `AWS_PROFILE` | Shared config profile |
+| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | Static credentials, used only when both are set |
+
+### S3Config
+
+`NewS3Client(awsCfg, cfg)` returns an `*s3.Client` and `NewS3PresignClient(awsCfg, cfg)` an `*s3.PresignClient` for AWS S3 or any S3-compatible store. Setting an endpoint switches to path-style addressing and sends checksums only when required, which S3-compatible stores need.
+
+| Variable | Description |
+|---|---|
+| `S3_BUCKET` | Bucket name |
+| `AWS_ENDPOINT_URL_S3` | Endpoint of an S3-compatible store; empty means AWS S3 |
+| `S3_REGION` | Region override for the bucket; required with an endpoint |
+| `S3_PUBLIC_ENDPOINT` | Endpoint browsers reach the store at, used to sign object URLs; defaults to the endpoint |
+
+| Store | `AWS_ENDPOINT_URL_S3` | `S3_REGION` |
+|---|---|---|
+| AWS S3 | | bucket region |
+| MinIO | `http://localhost:9000` | `us-east-1` |
+| Cloudflare R2 | `https://<account>.r2.cloudflarestorage.com` | `auto` |
+| Google Cloud Storage (HMAC keys) | `https://storage.googleapis.com` | `auto` |
+
+Signed URLs only work through a proxy that forwards the `Host` header unchanged, since it is part of the signature. R2 signs only its `r2.cloudflarestorage.com` host, not custom domains.
 
 ## Legacy Usage
 
